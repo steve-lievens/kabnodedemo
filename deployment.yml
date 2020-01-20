@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-config
+data:
+  CLIENT_TITLE: IBM Cloud Demo App
+  CLIENT_VERSION: 0.0.1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kabnodejsdemo
+  labels:
+    app: kabnodejsdemo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kabnodejsdemo
+  template:
+    metadata:
+      labels:
+        app: kabnodejsdemo
+    spec:
+      containers:
+      - name: kabnodejsdemo
+        image: willbereplacedbypipeline/default/kabnodejsdemo:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: demo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kabnodejsdemosvc-http-80
+  labels:
+    app: kabnodejsdemo
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  selector:
+    app: kabnodejsdemo
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kabnodejsdemoing-http-80
+spec:
+  rules:
+  - host: kabnodejsdemo.ibmpubcloud.tk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kabnodejsdemosvc-http-80
+          servicePort: 80
