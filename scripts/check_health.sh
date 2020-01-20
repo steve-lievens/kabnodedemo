@@ -43,7 +43,7 @@ CONTAINERS_JSON=$(kubectl get deployments --namespace ${CLUSTER_NAMESPACE} -o js
 echo $CONTAINERS_JSON | jq .
 
 LIVENESS_PROBE_PATH=$(echo $CONTAINERS_JSON | jq -r ".livenessProbe.httpGet.path" | head -n 1)
-echo ".$LIVENESS_PROBE_PATH."
+echo "Liveness Probe path = $LIVENESS_PROBE_PATH"
 # LIVENESS_PROBE_PORT=$(echo $CONTAINERS_JSON | jq -r ".livenessProbe.httpGet.port" | head -n 1)
 if [ ${LIVENESS_PROBE_PATH} != null ]; then
   LIVENESS_PROBE_URL=${EXT_APP_URL}${LIVENESS_PROBE_PATH}
@@ -59,7 +59,7 @@ else
 fi
 
 READINESS_PROBE_PATH=$(echo $CONTAINERS_JSON | jq -r ".readinessProbe.httpGet.path" | head -n 1)
-echo "Readiness Probe path = $READINESS_PROBE_PATH."
+echo "Readiness Probe path = $READINESS_PROBE_PATH"
 # READINESS_PROBE_PORT=$(echo $CONTAINERS_JSON | jq -r ".readinessProbe.httpGet.port" | head -n 1)
 if [ ${READINESS_PROBE_PATH} != null ]; then
   READINESS_PROBE_URL=${EXT_APP_URL}${READINESS_PROBE_PATH}
