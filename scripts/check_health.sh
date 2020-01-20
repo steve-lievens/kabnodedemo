@@ -14,10 +14,10 @@ echo "IMAGE_TAG=${IMAGE_TAG}"
 echo "REGISTRY_URL=${REGISTRY_URL}"
 echo "REGISTRY_NAMESPACE=${REGISTRY_NAMESPACE}"
 echo "CLUSTER_NAMESPACE=${CLUSTER_NAMESPACE}"
-echo "APP_URL=${APP_URL}"
+echo "EXT_APP_URL=${EXT_APP_URL}"
 
-if [ -z "${APP_URL}" ]; then
-  echo "APP_URL env variable not set. Skipping health check !"
+if [ -z "${EXT_APP_URL}" ]; then
+  echo "EXT_APP_URL env variable not set. Skipping health check !"
   exit 0
 fi
 
@@ -46,7 +46,7 @@ LIVENESS_PROBE_PATH=$(echo $CONTAINERS_JSON | jq -r ".livenessProbe.httpGet.path
 echo ".$LIVENESS_PROBE_PATH."
 # LIVENESS_PROBE_PORT=$(echo $CONTAINERS_JSON | jq -r ".livenessProbe.httpGet.port" | head -n 1)
 if [ ${LIVENESS_PROBE_PATH} != null ]; then
-  LIVENESS_PROBE_URL=${APP_URL}${LIVENESS_PROBE_PATH}
+  LIVENESS_PROBE_URL=${EXT_APP_URL}${LIVENESS_PROBE_PATH}
   if [ "$(curl -Is ${LIVENESS_PROBE_URL} --connect-timeout 3 --max-time 5 --retry 2 --retry-max-time 30 | head -n 1 | grep 200)" != "" ]; then
     echo "Successfully reached liveness probe endpoint: ${LIVENESS_PROBE_URL}"
     echo "====================================================================="
@@ -59,10 +59,10 @@ else
 fi
 
 READINESS_PROBE_PATH=$(echo $CONTAINERS_JSON | jq -r ".readinessProbe.httpGet.path" | head -n 1)
-echo ".$READINESS_PROBE_PATH."
+echo "Readiness Probe path = $READINESS_PROBE_PATH."
 # READINESS_PROBE_PORT=$(echo $CONTAINERS_JSON | jq -r ".readinessProbe.httpGet.port" | head -n 1)
 if [ ${READINESS_PROBE_PATH} != null ]; then
-  READINESS_PROBE_URL=${APP_URL}${READINESS_PROBE_PATH}
+  READINESS_PROBE_URL=${EXT_APP_URL}${READINESS_PROBE_PATH}
   if [ "$(curl -Is ${READINESS_PROBE_URL} --connect-timeout 3 --max-time 5 --retry 2 --retry-max-time 30 | head -n 1 | grep 200)" != "" ]; then
     echo "Successfully reached readiness probe endpoint: ${READINESS_PROBE_URL}"
     echo "====================================================================="
