@@ -15,7 +15,7 @@
 
 .landing-page__banner {
     padding-top: 1rem;
-    padding-bottom: 8rem;
+    padding-bottom: 1rem;
     background-color: #f3f3f3;
     position: relative;
 }
@@ -48,4 +48,9 @@
   outline: none;
   -webkit-transition: 70ms cubic-bezier(.2,0,.38,.9);
   transition: 70ms cubic-bezier(.2,0,.38,.9);
+}
+
+#welcome_image{
+  max-height: 150px;
+  padding-right: 50px;
 }

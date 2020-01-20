@@ -13,45 +13,59 @@
 </head>
 
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
     console.log("Document is ready !");
 
+    // Initial update
+    getEnvironmentAndUpdate();
+
+    // Buttons
+    $("#refreshpodinfo").click(function () {
+      getEnvironmentAndUpdate();
+    });
+
+  });
+
+  // GetEnvironment Ajax call (no caching)
+  function getEnvironmentAndUpdate() {
     //---------------------------------------------------------------------------------------------------------------
     // Retrieve environment variables from server
     //---------------------------------------------------------------------------------------------------------------
     var geturi = "getEnvironment";
-    var backenduri = "getRecordByKey?lisa_key=";
-    var backendcall = "";
     $.ajax({
-        type: 'GET',
-        url: geturi
-       })
-      .done(function(data, textStatus, jqXHR) {
+      type: 'GET',
+      url: geturi,
+      cache: false
+    })
+      .done(function (data, textStatus, jqXHR) {
         console.log("getEnvironment : Successfully retrieved environment from server");
         console.log(data);
 
         // Update the environment data in the UI
         $('#apptitle').text(data.client_title + " V" + data.client_version);
-        })
-      .fail(function(jqXHR, textStatus, errorThrown) {
-        if(jqXHR.status==500 || jqXHR.status==0){
+        $('#welcome_msg').text(data.welcome_msg);
+        $('#hostname').text(data.hostname);
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 500 || jqXHR.status == 0) {
           console.log("getEnvironment : 500 Returned info from server :-(");
           // Set the app title
           $('#apptitle').text("Error getting Environment. Please check.");
-          }
-        else{
+        }
+        else {
           console.log("getEnvironment : Some other fail ...");
           // Set the app title
           $('#apptitle').text("Error getting Environment. Please check.");
-          }
-        })
-      .always(function() {
+        }
+      })
+      .always(function () {
         console.log("getEnvironment : Ajax call done.");
-        });
       });
+  }
 </script>
 
 <body>
+  <!-- HEADER -->
   <header role="banner" data-header="" class="cv-header bx--header" aria-label="Demo App">
     <a href="/" id="apptitle" class="cv-header-name bx--header__name router-link-exact-active router-link-active"></a>
     <div class="bx--header__global">
@@ -68,77 +82,77 @@
     </div>
   </header>
 
+  <!-- INFO PANE -->
   <main class="bx--content">
     <div class="bx--grid bx--grid--full-width landing-page">
       <div class="bx--row landing-page__banner">
         <div class="bx--col-lg-16">
+          <img id="welcome_image" class="img-responsive" src="./images/k8s.png">
+        </div>
+        <div class="bx--col-lg-16">
+          <h1 id="welcome_msg" class="landing-page__heading"></h1>
           <nav class="bx--breadcrumb bx--breadcrumb--no-trailing-slash" aria-label="Page navigation">
-            <div class="bx--breadcrumb-item"><a href="/" class="bx--link">More info ...</a></div>
+            <div class="bx--breadcrumb-item"><a href="http://cloud.ibm.com" target="_blank" class="bx--link">More info
+                ...</a></div>
           </nav>
-          <h1 class="landing-page__heading">IBM Cloud demo app</h1>
         </div>
       </div>
     </div>
 
-    <!--
-  Copyright IBM Corp. 2016, 2018
+    <!-- TAB HEADERS -->
+    <div data-tabs class="bx--tabs">
+      <div class="bx--tabs-trigger" tabindex="0">
+        <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
+        <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
+          xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
+          <path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path>
+        </svg>
+      </div>
+      <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
+        <li class="bx--tabs__nav-item bx--tabs__nav-item--selected " data-target=".tab-1" role="tab"
+          aria-selected="true">
+          <a tabindex="0" id="tab-link-1" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+            aria-controls="tab-panel-1">POD Info</a>
+        </li>
+        <li class="bx--tabs__nav-item bx--tabs__nav-item--disabled" data-target=".tab-2" role="tab">
+          <a tabindex="0" id="tab-link-2" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+            aria-controls="tab-panel-2">COS Demo</a>
+        </li>
+        <li class="bx--tabs__nav-item bx--tabs__nav-item--disabled" data-target=".tab-3" role="tab">
+          <a tabindex="0" id="tab-link-3" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+            aria-controls="tab-panel-3">App ID Demo</a>
+        </li>
+        <li class="bx--tabs__nav-item  bx--tabs__nav-item--disabled" data-target=".tab-4" role="tab"
+          aria-disabled="true">
+          <a tabindex="0" id="tab-link-4" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+            aria-controls="tab-panel-4">YAD (Yet Another Demo)</a>
+        </li>
+      </ul>
+    </div>
 
-  This source code is licensed under the Apache-2.0 license found in the
-  LICENSE file in the root directory of this source tree.
--->
-
-<div data-tabs class="bx--tabs">
-    <div class="bx--tabs-trigger" tabindex="0">
-      <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
-      <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path></svg>
+    <!-- TAB CONTENT -->
+    <div>
+      <!-- TAB1 -->
+      <div id="tab-panel-1" class="tab-1" role="tabpanel" aria-labelledby="tab-link-1" aria-hidden="false">
+        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Hostname of the POD :</p>
+        <br>
+        <p id="hostname" style="padding: 0 1rem; font-size: 14px; font-weight: 600;"></p>
+        <br>
+        <button id="refreshpodinfo" class="bx--btn bx--btn--primary" type="button">Refresh</button>
+      </div>
+      <!-- TAB2 -->
+      <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2" aria-hidden="true" hidden>
+        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for second tab goes here.</p>
+      </div>
+      <!-- TAB3 -->
+      <div id="tab-panel-3" class="tab-3" role="tabpanel" aria-labelledby="tab-link-3" aria-hidden="true" hidden>
+        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for third tab goes here.</p>
+      </div>
+      <!-- TAB4 -->
+      <div id="tab-panel-4" class="tab-4" role="tabpanel" aria-labelledby="tab-link-4" aria-hidden="true" hidden>
+        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for fourth tab goes here.</p>
+      </div>
     </div>
-    <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
-      <li
-        class="bx--tabs__nav-item bx--tabs__nav-item--selected "
-        data-target=".tab-1" role="tab"  aria-selected="true"  >
-        <a tabindex="0" id="tab-link-1" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-          aria-controls="tab-panel-1">Tab label 1</a>
-      </li>
-      <li
-        class="bx--tabs__nav-item "
-        data-target=".tab-2" role="tab"  >
-        <a tabindex="0" id="tab-link-2" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-          aria-controls="tab-panel-2">Tab label 2</a>
-      </li>
-      <li
-        class="bx--tabs__nav-item "
-        data-target=".tab-3" role="tab"  >
-        <a tabindex="0" id="tab-link-3" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-          aria-controls="tab-panel-3">Tab label 3</a>
-      </li>
-      <li
-        class="bx--tabs__nav-item  bx--tabs__nav-item--disabled "
-        data-target=".tab-4" role="tab"  
-        aria-disabled="true" >
-        <a tabindex="0" id="tab-link-4" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-          aria-controls="tab-panel-4">Tab label 4</a>
-      </li>
-    </ul>
-  </div>
-  <!-- The markup below is for demonstration purposes only -->
-  <div>
-    <div id="tab-panel-1" class="tab-1" role="tabpanel" aria-labelledby="tab-link-1"
-      aria-hidden="false" >
-      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for first tab goes here.</p>
-    </div>
-    <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2"
-      aria-hidden="true"  hidden>
-      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for second tab goes here.</p>
-    </div>
-    <div id="tab-panel-3" class="tab-3" role="tabpanel" aria-labelledby="tab-link-3"
-      aria-hidden="true"  hidden>
-      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for third tab goes here.</p>
-    </div>
-    <div id="tab-panel-4" class="tab-4" role="tabpanel" aria-labelledby="tab-link-4"
-      aria-hidden="true"  hidden>
-      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for fourth tab goes here.</p>
-    </div>
-  </div>
   </main>
 
 </body>

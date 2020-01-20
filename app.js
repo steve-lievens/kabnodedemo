@@ -27,6 +27,7 @@ require("dotenv-defaults").config({
 var APP_NAME = process.env.APP_NAME;
 var CLIENT_VERSION = process.env.CLIENT_VERSION;
 var CLIENT_TITLE = process.env.CLIENT_TITLE;
+var WELCOME_MSG = process.env.WELCOME_MSG;
 var REGION = process.env.REGION;
 
 // --------------------------------------------------------------------------
@@ -78,9 +79,10 @@ app.get('/getEnvironment', function(req, res) {
       "hostname": hostname,
       "region": REGION,
       "client_title": CLIENT_TITLE,
-      "client_version": CLIENT_VERSION
+      "client_version": CLIENT_VERSION,
+      "welcome_msg": WELCOME_MSG
     }
-    console.log("INFO: Service gethostinfo returning " + JSON.stringify(hostobj));
+    console.log("INFO: Service getEnvironment returning : " + JSON.stringify(hostobj));
     res.json(hostobj);
   });
 
