@@ -1,0 +1,432 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" type="text/css" href="css/carbon-components.min.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+
+  <script src="js/carbon-components.min.js"></script>
+
+  <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+  <title>Registration Form</title>
+</head>
+
+<script>
+  $(document).ready(function() {
+    console.log("Document is ready !");
+
+    //---------------------------------------------------------------------------------------------------------------
+    // Retrieve environment variables from server
+    //---------------------------------------------------------------------------------------------------------------
+    var geturi = "getEnvironment";
+    var backenduri = "getRecordByKey?lisa_key=";
+    var backendcall = "";
+    $.ajax({
+        type: 'GET',
+        url: geturi
+       })
+      .done(function(data, textStatus, jqXHR) {
+        console.log("getEnvironment : Successfully retrieved environment from server");
+        console.log(data);
+
+        // Set the app title
+        $('#apptitle').text(data.ES_CLIENT_TITLE);
+        $('#ES_CLIENT_ID').text(data.ES_CLIENT_ID);
+        $('#ES_CLIENT_VERSION').text(data.ES_CLIENT_VERSION);
+        $('#ES_BROKER').text(data.ES_BROKER);
+        $('#ES_TOPICNAME').text(data.ES_TOPICNAME);
+        $('#CLIENT_TIMEOUT').text(data.CLIENT_TIMEOUT);
+        })
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        if(jqXHR.status==500 || jqXHR.status==0){
+          console.log("getEnvironment : 500 Returned info from server :-(");
+          // Set the app title
+          $('#apptitle').text("Error getting Environment. Please check.");
+          }
+        else{
+          console.log("getEnvironment : Some other fail ...");
+          // Set the app title
+          $('#apptitle').text("Error getting Environment. Please check.");
+          }
+        })
+      .always(function() {
+        console.log("getEnvironment : Ajax call done.");
+        });
+
+
+    //---------------------------------------------------------------------------------------------------------------
+    // Submit when the button is clicked
+    //---------------------------------------------------------------------------------------------------------------
+    $("#submitform").click(function() {
+      // Reset the notification windows in case they're still visible
+      $("#infobox").css("display", "none");
+      $("#errorbox").css("display", "none");
+      $("#infobox2").css("display", "none");
+      $("#errorbox2").css("display", "none");
+
+      // Start the loading animation
+      $("#loading").css("display", "inherit");
+      $("#loading2").css("display", "inherit");
+
+      // Get the input values
+      var firstname = $('#msg_fname').val();
+      var lastname = $('#msg_lname').val();
+      var birthdate = $('#msg_bdate').val();
+      var nationality = $('#msg_nat').val();
+
+      // Send it to the server.
+      var payload = {
+        fname: firstname,
+        lname: lastname,
+        bdate: birthdate,
+        nationality: nationality
+      };
+      var posturi = "postRegistration";
+
+      console.log("Posting registration to server ...");
+      console.log(payload);
+
+      $.ajax({
+          type: 'POST',
+          url: posturi,
+          data: JSON.stringify(payload),
+          contentType: "application/json; charset=utf-8"
+         })
+        .done(function(data, textStatus, jqXHR) {
+          console.log("Successfully returned from server");
+          console.log(data);
+          var appkey = data.appkey;
+          backendcall = backenduri + appkey;
+          console.log(appkey);
+          $("#keyarea").text(appkey);
+          $("#infobox").css("display", "flex");
+          $("#loading").css("display", "none");
+          // Now check if the message has arrived in the database
+          var nrofchecks = 0;
+          var dbtimer = setInterval ( function() {
+            getDatabaseResult(backendcall, function(err, success){
+              console.log("returning from dblookup")
+              if(success){
+                console.log("Clearing timer.");
+                $("#infobox2").css("display", "flex");
+                $("#loading2").css("display", "none");
+
+                clearInterval(dbtimer);
+                }
+              else{
+                console.log("No record found ... keeping the timer.")
+                nrofchecks++;
+                if(nrofchecks > 10){
+                  clearInterval(dbtimer);
+                  console.log("No record found ... Aborting after 10 times.");
+                  $("#errorbox2").css("display", "flex");
+                  $("#loading2").css("display", "none");
+                  $("#keyareaerror2").text("Record not found.");
+                  }
+                }
+              })
+           }, 500);
+          })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          if(jqXHR.status==500 || jqXHR.status==0){
+            console.log("500 Returned info from server :-(");
+            }
+          else{
+            console.log("Some other fail ...");
+            }
+            $("#errorbox").css("display", "flex");
+            $("#loading").css("display", "none");
+            $("#errorbox2").css("display", "flex");
+            $("#loading2").css("display", "none");
+            $("#keyareaerror2").text("Couldn't connect to database.");
+          })
+        .always(function() {
+          console.log("Ajax call done.");
+        });
+      });
+
+      //---------------------------------------------------------------------------------------------------------------
+      // Click functions for info box
+      //---------------------------------------------------------------------------------------------------------------
+      $("#infoboxclose").click(function() {
+        $("#infobox").css("display", "none");
+      });
+      $("#errorboxclose").click(function() {
+        $("#errorbox").css("display", "none");
+      });
+      $("#infobox2close").click(function() {
+        $("#infobox2").css("display", "none");
+      });
+      $("#errorbox2close").click(function() {
+        $("#errorbox2").css("display", "none");
+      });
+      $("#errorbox2reload").click(function() {
+        $("#errorbox2").css("display", "none");
+        $("#loading2").css("display", "none");
+        getDatabaseResult(backendcall, function(err, success){
+          console.log("returning from dblookup")
+          if(success){
+            console.log("Clearing timer.");
+            $("#infobox2").css("display", "flex");
+            $("#loading2").css("display", "none");
+            }
+          else{
+            console.log("No record found ... ")
+            $("#errorbox2").css("display", "flex");
+            $("#loading2").css("display", "none");
+            $("#keyareaerror2").text("Record not found.");
+            }
+          });
+      });
+  });
+
+  function getDatabaseResult(uri, callback){
+    var resultsize;
+    $.ajax({
+        type: 'GET',
+        url: uri
+       })
+      .done(function(data, textStatus, jqXHR) {
+        console.log("getDatabaseResult : Successfully retrieved info from server.");
+        console.log(data);
+        resultsize = data.length;
+        })
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        if(jqXHR.status==500 || jqXHR.status==0){
+          console.log("getDatabaseResult : 500 Returned info from server :-(");
+          // Set the app title
+          $('#apptitle').text("Error getting to backend. Please check.");
+          }
+        else{
+          console.log("getDatabaseResult : Some other fail ...");
+          // Set the app title
+          $('#apptitle').text("Error getting to backend. Please check.");
+          }
+        resultsize = 0;
+        callback(errorThrown, false);
+        })
+      .always(function() {
+        console.log("getDatabaseResult : Ajax call done.");
+        if(resultsize == 0){
+          console.log("No db record yet.");
+          callback(null, false);
+        }
+        if(resultsize > 0){
+          console.log("Dbrecord found.");
+          callback(null, true);
+        }
+        });
+  };
+</script>
+
+<body>
+
+  <div id="app" class="bx--grid">
+    <div id="header" class="no-margin-hor bx--row">
+      <div id="apptitle" class="aligncenter bx--col"></div>
+    </div>
+    <div id="base" class="bx--row">
+      <div id="nav" class="bx--col-sm-0 bx--col-md-1">
+        <div id="environment">
+          Environment variables :
+          <div class="envtitle">
+            ES_CLIENT_VERSION=
+          </div>
+          <div id="ES_CLIENT_VERSION" class="envcontent"></div>
+          <div class="envtitle">
+            ES_CLIENT_ID=
+          </div>
+          <div id="ES_CLIENT_ID" class="envcontent"></div>
+          <div class="envtitle">
+            ES_BROKER=
+          </div>
+          <div id="ES_BROKER" class="envcontent"></div>
+          <div class="envtitle">
+            ES_TOPICNAME=
+          </div>
+          <div id="ES_TOPICNAME" class="envcontent"></div>
+          <div class="envtitle">
+            CLIENT_TIMEOUT=
+          </div>
+          <div id="CLIENT_TIMEOUT" class="envcontent"></div>
+        </div>
+      </div>
+      <div id="main" class="bx--col-sm-4 bx--col-md-7">
+
+        <div class="bx--tile">
+          <div id="title">Registration Form</div>
+          Please fill out the below form to register a person entering the EU.
+        </div>
+
+        <div class="no-padding-hor bx--grid">
+
+          <div class="bx--row">
+
+            <div class="bx--col">
+              <div class="bx--form-item">
+                <label for="text-input-3" class="bx--label font-bold">First Name</label>
+                <div class="bx--form__helper-text max-width-full">
+                  First Name as it appears on the international passport.
+                </div>
+                <input id="msg_fname" type="text" class="bx--text-input" placeholder="">
+              </div>
+            </div>
+
+            <div class="bx--col">
+              <div class="bx--form-item">
+                <label for="text-input-3" class="bx--label font-bold">Last Name</label>
+                <div class="bx--form__helper-text max-width-full">
+                  Last Name as it appears on the international passport.
+                </div>
+                <input id="msg_lname" type="text" class="bx--text-input" placeholder="">
+              </div>
+            </div>
+          </div>
+
+          <div class="bx--row">
+
+            <div class="bx--col">
+              <div class="bx--form-item">
+                <label for="text-input-3" class="bx--label font-bold">Nationality</label>
+                <div class="bx--form__helper-text max-width-full">
+                  Country of origin as it appears on the international passport.
+                </div>
+                <input id="msg_nat" type="text" class="bx--text-input" placeholder="">
+              </div>
+            </div>
+
+            <div class="bx--col">
+              <div class="bx--form-item">
+                <div data-date-picker data-date-picker-type="single" class="bx--date-picker bx--date-picker--single max-width-full">
+                  <div class="bx--date-picker-container max-width-full">
+                    <label for="date-picker-3" class="bx--label font-bold">Date of birth</label>
+                    <div class="bx--form__helper-text max-width-full">
+                      Date of birth as it appears on the international passport.
+                    </div>
+                    <div class="bx--date-picker-input__wrapper">
+                      <input type="text" id="msg_bdate" class="bx--date-picker__input max-width-full" pattern="\d{1,2}/\d{1,2}/\d{4}" placeholder="mm/dd/yyyy" data-date-picker-input />
+                      <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" data-date-picker-icon="true" class="bx--date-picker__icon" width="16" height="16" viewBox="0 0 16 16"
+                        aria-hidden="true">
+                        <path d="M13 2h-2V1h-1v1H6V1H5v1H3c-.6 0-1 .4-1 1v10c0 .6.4 1 1 1h10c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1zm0 11H3V6h10v7zm0-8H3V3h2v1h1V3h4v1h1V3h2v2z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="bx--row">
+
+          <div class="bx--col">
+            <div class="bx--form-item">
+              <button id="submitform" class="bx--btn bx--btn--primary" type="button">Submit</button>
+            </div>
+          </div>
+
+          <div class="bx--col">
+
+            <div id="infobox" data-notification class="bx--toast-notification bx--toast-notification--success" role="alert">
+              <div class="bx--toast-notification__details">
+                <h3 class="bx--toast-notification__title">Successfully registered</h3>
+                <p class="bx--toast-notification__subtitle">This registration has been saved successfully with key :</p>
+                <p id="keyarea" class="bx--toast-notification__subtitle"></p>
+                <p class="bx--toast-notification__caption">
+                  <div id="infotime"></div>
+                </p>
+              </div>
+              <button id="infoboxclose" class="bx--toast-notification__close-button" type="button" aria-label="close">
+                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M12 4.7l-.7-.7L8 7.3 4.7 4l-.7.7L7.3 8 4 11.3l.7.7L8 8.7l3.3 3.3.7-.7L8.7 8z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div id="errorbox" data-notification class="bx--toast-notification bx--toast-notification--error" role="alert">
+              <div class="bx--toast-notification__details">
+                <h3 class="bx--toast-notification__title">Unable to save registration</h3>
+                <p class="bx--toast-notification__subtitle">At this time it is not possible to save new registrations. Please try again later. Apologies for this inconvenience.</p>
+                <p id="keyareaerror" class="bx--toast-notification__subtitle"></p>
+                <p class="bx--toast-notification__caption">
+                  <div id="errortime"></div>
+                </p>
+              </div>
+              <button id="errorboxclose" class="bx--toast-notification__close-button" type="button" aria-label="close">
+                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M12 4.7l-.7-.7L8 7.3 4.7 4l-.7.7L7.3 8 4 11.3l.7.7L8 8.7l3.3 3.3.7-.7L8.7 8z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div id="loading" data-loading class="bx--loading">
+              <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
+                <title>Loading</title>
+
+                <circle class="bx--loading__stroke" cx="0" cy="0" r="37.5" />
+              </svg>
+            </div>
+
+          </div>
+
+          <div class="bx--col">
+
+            <div id="infobox2" data-notification class="bx--toast-notification bx--toast-notification--success" role="alert">
+              <div class="bx--toast-notification__details">
+                <h3 class="bx--toast-notification__title">Successfully Written</h3>
+                <p class="bx--toast-notification__subtitle">This registration has been saved successfully in the database !</p>
+                <p id="keyarea2" class="bx--toast-notification__subtitle"></p>
+                <p class="bx--toast-notification__caption">
+                  <div id="infotime2"></div>
+                </p>
+              </div>
+              <button id="infobox2close" class="bx--toast-notification__close-button" type="button" aria-label="close">
+                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M12 4.7l-.7-.7L8 7.3 4.7 4l-.7.7L7.3 8 4 11.3l.7.7L8 8.7l3.3 3.3.7-.7L8.7 8z"></path>
+                </svg>
+              </button>
+            </div>
+
+            <div id="errorbox2" data-notification class="bx--toast-notification bx--toast-notification--error" role="alert">
+              <div class="bx--toast-notification__details">
+                <h3 class="bx--toast-notification__title">Unable to retrieve registration</h3>
+                <p class="bx--toast-notification__subtitle">At this time it is not possible to check the database status of the registration.</p>
+                <p id="keyareaerror2" class="bx--toast-notification__subtitle"></p>
+                <p class="bx--toast-notification__caption">
+                  <div id="errortime"></div>
+                </p>
+              </div>
+              <button id="errorbox2close" class="bx--toast-notification__close-button" type="button" aria-label="close">
+                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M12 4.7l-.7-.7L8 7.3 4.7 4l-.7.7L7.3 8 4 11.3l.7.7L8 8.7l3.3 3.3.7-.7L8.7 8z"></path>
+                </svg>
+              </button>
+              <button id="errorbox2reload" class="bx--toast-notification__close-button" type="button" aria-label="close">
+                <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                  <use xlink:href="images/carbon-icons.svg#icon--restart"></use>
+                </svg>
+              </button>
+            </div>
+
+            <div id="loading2" data-loading class="bx--loading">
+              <svg class="bx--loading__svg" viewBox="-75 -75 150 150">
+                <title>Loading</title>
+
+                <circle class="bx--loading__stroke" cx="0" cy="0" r="37.5" />
+              </svg>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

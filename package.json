@@ -1,0 +1,21 @@
+{
+  "name": "nodejs-simple",
+  "version": "0.1.0",
+  "description": "Simple Node.js application",
+  "license": "Apache-2.0",
+  "scripts": {
+    "start": "node app.js",
+    "debug": "node --inspect app.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "carbon-components": "^10.7.4",
+    "dotenv-defaults": "^1.0.2",
+    "express": "^4.17.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/appsody/stacks.git",
+    "directory": "incubator/nodejs/templates/simple"
+  }
+}

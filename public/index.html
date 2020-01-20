@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="stylesheet" type="text/css" href="css/carbon-components.min.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <script src="scripts/carbon-components.min.js"></script>
+  <script src="scripts/jquery-3.4.1.min.js"></script>
+  <title>Node.js & Carbon UI Demo App</title>
+</head>
+
+<body>
+  <header role="banner" data-header="" class="cv-header bx--header" aria-label="Demo App">
+    <a href="/" class="cv-header-name bx--header__name router-link-exact-active router-link-active"><span
+        class="bx--header__name--prefix">CPY&nbsp;</span>Demo App</a>
+    <div class="bx--header__global">
+      <button type="button" aria-haspopup="true" class="cv-header-global-action bx--header__action"
+        aria-label="User avatar"><svg focusable="false" preserveAspectRatio="xMidYMid meet"
+          style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32"
+          aria-hidden="true">
+          <path
+            d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm-6 24.38v-2A3.22 3.22 0 0 1 13 21h6a3.22 3.22 0 0 1 3 3.39v2a11.92 11.92 0 0 1-12 0zm14-1.46v-.61A5.21 5.21 0 0 0 19 19h-6a5.2 5.2 0 0 0-5 5.31v.59a12 12 0 1 1 16 0z">
+          </path>
+          <path d="M16 7a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="bx--content">
+    <div class="bx--grid bx--grid--full-width landing-page">
+      <div class="bx--row landing-page__banner">
+        <div class="bx--col-lg-16">
+          <nav class="bx--breadcrumb bx--breadcrumb--no-trailing-slash" aria-label="Page navigation">
+            <div class="bx--breadcrumb-item"><a href="/" class="bx--link">More info ...</a></div>
+          </nav>
+          <h1 class="landing-page__heading">IBM Cloud demo app</h1>
+        </div>
+      </div>
+    </div>
+
+    <!--
+  Copyright IBM Corp. 2016, 2018
+
+  This source code is licensed under the Apache-2.0 license found in the
+  LICENSE file in the root directory of this source tree.
+-->
+
+<div data-tabs class="bx--tabs">
+    <div class="bx--tabs-trigger" tabindex="0">
+      <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
+      <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path></svg>
+    </div>
+    <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
+      <li
+        class="bx--tabs__nav-item bx--tabs__nav-item--selected "
+        data-target=".tab-1" role="tab"  aria-selected="true"  >
+        <a tabindex="0" id="tab-link-1" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+          aria-controls="tab-panel-1">Tab label 1</a>
+      </li>
+      <li
+        class="bx--tabs__nav-item "
+        data-target=".tab-2" role="tab"  >
+        <a tabindex="0" id="tab-link-2" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+          aria-controls="tab-panel-2">Tab label 2</a>
+      </li>
+      <li
+        class="bx--tabs__nav-item "
+        data-target=".tab-3" role="tab"  >
+        <a tabindex="0" id="tab-link-3" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+          aria-controls="tab-panel-3">Tab label 3</a>
+      </li>
+      <li
+        class="bx--tabs__nav-item  bx--tabs__nav-item--disabled "
+        data-target=".tab-4" role="tab"  
+        aria-disabled="true" >
+        <a tabindex="0" id="tab-link-4" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
+          aria-controls="tab-panel-4">Tab label 4</a>
+      </li>
+    </ul>
+  </div>
+  <!-- The markup below is for demonstration purposes only -->
+  <div>
+    <div id="tab-panel-1" class="tab-1" role="tabpanel" aria-labelledby="tab-link-1"
+      aria-hidden="false" >
+      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for first tab goes here.</p>
+    </div>
+    <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2"
+      aria-hidden="true"  hidden>
+      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for second tab goes here.</p>
+    </div>
+    <div id="tab-panel-3" class="tab-3" role="tabpanel" aria-labelledby="tab-link-3"
+      aria-hidden="true"  hidden>
+      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for third tab goes here.</p>
+    </div>
+    <div id="tab-panel-4" class="tab-4" role="tabpanel" aria-labelledby="tab-link-4"
+      aria-hidden="true"  hidden>
+      <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for fourth tab goes here.</p>
+    </div>
+  </div>
+  </main>
+
+</body>
+
+</html>
