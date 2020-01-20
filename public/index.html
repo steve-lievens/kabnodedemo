@@ -12,10 +12,48 @@
   <title>Node.js & Carbon UI Demo App</title>
 </head>
 
+<script>
+  $(document).ready(function() {
+    console.log("Document is ready !");
+
+    //---------------------------------------------------------------------------------------------------------------
+    // Retrieve environment variables from server
+    //---------------------------------------------------------------------------------------------------------------
+    var geturi = "getEnvironment";
+    var backenduri = "getRecordByKey?lisa_key=";
+    var backendcall = "";
+    $.ajax({
+        type: 'GET',
+        url: geturi
+       })
+      .done(function(data, textStatus, jqXHR) {
+        console.log("getEnvironment : Successfully retrieved environment from server");
+        console.log(data);
+
+        // Update the environment data in the UI
+        $('#apptitle').text(data.client_title + " V" + data.client_version);
+        })
+      .fail(function(jqXHR, textStatus, errorThrown) {
+        if(jqXHR.status==500 || jqXHR.status==0){
+          console.log("getEnvironment : 500 Returned info from server :-(");
+          // Set the app title
+          $('#apptitle').text("Error getting Environment. Please check.");
+          }
+        else{
+          console.log("getEnvironment : Some other fail ...");
+          // Set the app title
+          $('#apptitle').text("Error getting Environment. Please check.");
+          }
+        })
+      .always(function() {
+        console.log("getEnvironment : Ajax call done.");
+        });
+      });
+</script>
+
 <body>
   <header role="banner" data-header="" class="cv-header bx--header" aria-label="Demo App">
-    <a href="/" class="cv-header-name bx--header__name router-link-exact-active router-link-active"><span
-        class="bx--header__name--prefix">CPY&nbsp;</span>Demo App</a>
+    <a href="/" id="apptitle" class="cv-header-name bx--header__name router-link-exact-active router-link-active"></a>
     <div class="bx--header__global">
       <button type="button" aria-haspopup="true" class="cv-header-global-action bx--header__action"
         aria-label="User avatar"><svg focusable="false" preserveAspectRatio="xMidYMid meet"

@@ -73,10 +73,12 @@ app.get('/health', function(req, res) {
 // --------------------------------------------------------------------------
 // REST API : retrieve info about the host
 // --------------------------------------------------------------------------
-app.get('/gethostinfo', function(req, res) {
+app.get('/getEnvironment', function(req, res) {
     var hostobj = {
       "hostname": hostname,
-      "region": REGION
+      "region": REGION,
+      "client_title": CLIENT_TITLE,
+      "client_version": CLIENT_VERSION
     }
     console.log("INFO: Service gethostinfo returning " + JSON.stringify(hostobj));
     res.json(hostobj);

@@ -3,8 +3,9 @@ kind: ConfigMap
 metadata:
   name: demo-config
 data:
+  APP_NAME=: IBM Cloud Demo App
   CLIENT_TITLE: IBM Cloud Demo App
-  CLIENT_VERSION: 0.0.1
+  CLIENT_VERSION: 0.0.2
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,6 +31,14 @@ spec:
         envFrom:
         - configMapRef:
             name: demo-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
 ---
 apiVersion: v1
 kind: Service
