@@ -23,15 +23,19 @@
     $("#refreshpodinfo").click(function () {
       getEnvironmentAndUpdate();
     });
+    $("#crashpod").click(function () {
+      crashPod();
+    });
 
   });
 
-  // GetEnvironment Ajax call (no caching)
+  //---------------------------------------------------------------------------------------------------------------
+  // Retrieve environment variables from server
+  //---------------------------------------------------------------------------------------------------------------
   function getEnvironmentAndUpdate() {
-    //---------------------------------------------------------------------------------------------------------------
-    // Retrieve environment variables from server
-    //---------------------------------------------------------------------------------------------------------------
     var geturi = "getEnvironment";
+
+    // GetEnvironment Ajax call (no caching)
     $.ajax({
       type: 'GET',
       url: geturi,
@@ -62,6 +66,33 @@
         console.log("getEnvironment : Ajax call done.");
       });
   }
+
+  //---------------------------------------------------------------------------------------------------------------
+  // Crash the server ... and therefor the Pod
+  //---------------------------------------------------------------------------------------------------------------
+  function crashPod() {
+    var geturi = "crashPod";
+    $.ajax({
+      type: 'GET',
+      url: geturi,
+      cache: false
+    })
+      .done(function (data, textStatus, jqXHR) {
+        console.log("crashPod : Successfully called !");
+        console.log(data);
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 500 || jqXHR.status == 0) {
+          console.log("crashPod : 500 Returned info from server :-(");
+        }
+        else {
+          console.log("crashPod : Some other fail ...");
+        }
+      })
+      .always(function () {
+        console.log("crashPod : Ajax call done.");
+      });
+  } 
 </script>
 
 <body>
@@ -139,6 +170,7 @@
         <p id="hostname" style="padding: 0 1rem; font-size: 14px; font-weight: 600;"></p>
         <br>
         <button id="refreshpodinfo" class="bx--btn bx--btn--primary" type="button">Refresh</button>
+        <button id="crashpod" class="bx--btn bx--btn--danger" type="button">Crash the Pod !</button>
       </div>
       <!-- TAB2 -->
       <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2" aria-hidden="true" hidden>

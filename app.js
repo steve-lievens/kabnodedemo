@@ -90,12 +90,25 @@ app.get('/getEnvironment', function(req, res) {
 // REST API : send error to log
 // --------------------------------------------------------------------------
 app.get('/senderror', function(req, res) {
-    var notused = {
-      "zero": "zero"
-    }
-    console.log("ERROR: Test error message - No real error has occurred.");
-    res.json(notused);
-  });
+  var notused = {
+    "zero": "zero"
+  }
+  console.log("ERROR: Test error message - No real error has occurred.");
+  res.json(notused);
+});
+
+// --------------------------------------------------------------------------
+// REST API : crash the server ... yeah ... really !
+// --------------------------------------------------------------------------
+app.get('/crashPod', function(req, res) {
+  var notused = {
+    "zero": "zero"
+  }
+  console.log("INFO: Crashing Pod ...");
+  res.json(notused);
+
+  process.exit(1);
+});
 
 // --------------------------------------------------------------------------
 // REST API : get a fibonacci number
