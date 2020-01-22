@@ -4,7 +4,7 @@ metadata:
   name: kabnodejsdemoing-http-80
 spec:
   rules:
-  - host: kabnodejsdemo.ibmpubcloud.tk
+  - host: kabnodejsdemoocp.ibmpubcloud.tk
     http:
       paths:
       - path: /

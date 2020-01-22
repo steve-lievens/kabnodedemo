@@ -42,7 +42,7 @@
     $("#notifyappdeadclose").click(function () {
       $("#notifyappdead").css("display", "none");
     });
-    
+
   });
 
   //---------------------------------------------------------------------------------------------------------------
@@ -69,7 +69,10 @@
 
         // Update the Welcome image
         var image_src = "./images/" + data.welcome_img;
-        $("#welcome_img").attr("src",image_src);
+        $("#welcome_img").attr("src", image_src);
+
+        // Remove the error notification
+        $('#notifyappdead').css("display", "none");
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status == 500 || jqXHR.status == 0) {
