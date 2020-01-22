@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kabnodejsdemo
+  labels:
+    app: kabnodejsdemo
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kabnodejsdemo
+  template:
+    metadata:
+      labels:
+        app: kabnodejsdemo
+    spec:
+      containers:
+      - name: kabnodejsdemo
+        image: de.icr.io/kabanero/kabnodejsdemo:latest
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: demo-config
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080

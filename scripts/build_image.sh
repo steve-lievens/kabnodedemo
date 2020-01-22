@@ -58,6 +58,11 @@ if [ -z "${DOCKER_ROOT}" ]; then DOCKER_ROOT=. ; fi
 if [ -z "${DOCKER_FILE}" ]; then DOCKER_FILE=Dockerfile ; fi
 set -x
 ibmcloud cr build -f ${DOCKER_ROOT}/${DOCKER_FILE} -t ${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME}:${IMAGE_TAG} ${EXTRA_BUILD_ARGS} ${DOCKER_ROOT}
+######################################################################################
+# Added 22/01/2020 - Also have a build with the tag 'latest'
+######################################################################################
+ibmcloud cr build -f ${DOCKER_ROOT}/${DOCKER_FILE} -t ${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME}:latest ${EXTRA_BUILD_ARGS} ${DOCKER_ROOT}
+
 set +x
 
 ibmcloud cr image-inspect ${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME}:${IMAGE_TAG}
