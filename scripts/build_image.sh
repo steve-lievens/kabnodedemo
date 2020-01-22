@@ -61,6 +61,8 @@ ibmcloud cr build -f ${DOCKER_ROOT}/${DOCKER_FILE} -t ${REGISTRY_URL}/${REGISTRY
 ######################################################################################
 # Added 22/01/2020 - Also have a build with the tag 'latest'
 ######################################################################################
+echo "=========================================================="
+echo -e "BUILDING CONTAINER IMAGE: ${IMAGE_NAME}:latest"
 ibmcloud cr build -f ${DOCKER_ROOT}/${DOCKER_FILE} -t ${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME}:latest ${EXTRA_BUILD_ARGS} ${DOCKER_ROOT}
 
 set +x

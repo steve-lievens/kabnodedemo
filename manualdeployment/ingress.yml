@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kabnodejsdemoing-http-80
+spec:
+  rules:
+  - host: kabnodejsdemo.ibmpubcloud.tk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kabnodejsdemosvc-http-80
+          servicePort: 80
