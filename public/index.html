@@ -16,6 +16,12 @@
   $(document).ready(function () {
     console.log("Document is ready !");
 
+    // Initialize
+
+    // Hide the notifications
+    $("#notifypodcrasharea").css("display", "none");
+    $("#notifyappdead").css("display", "none");
+
     // Initial update
     getEnvironmentAndUpdate();
 
@@ -24,7 +30,13 @@
       getEnvironmentAndUpdate();
     });
     $("#crashpod").click(function () {
-      crashPod();
+      crashPod(function () {
+        getEnvironmentAndUpdate();
+      });
+
+    });
+    $("#notifypodcrashareaclose").click(function () {
+      $("#notifypodcrasharea").css("display", "none");
     });
 
   });
@@ -49,17 +61,25 @@
         $('#apptitle').text(data.client_title + " V" + data.client_version);
         $('#welcome_msg').text(data.welcome_msg);
         $('#hostname').text(data.hostname);
+
+        // Update the Welcome image
+        var image_src = "./images/" + data.welcome_img;
+        $("#welcome_img").attr("src",image_src);
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status == 500 || jqXHR.status == 0) {
           console.log("getEnvironment : 500 Returned info from server :-(");
-          // Set the app title
-          $('#apptitle').text("Error getting Environment. Please check.");
+          // Show the error notification
+          $('#notifyappdead').css("display", "flex");
+          // Empty the hostname
+          $('#hostname').text("no pod available");
         }
         else {
           console.log("getEnvironment : Some other fail ...");
-          // Set the app title
-          $('#apptitle').text("Error getting Environment. Please check.");
+          // Show the error notification
+          $('#notifyappdead').css("display", "flex");
+          // Empty the hostname
+          $('#hostname').text("no pod available");
         }
       })
       .always(function () {
@@ -70,7 +90,7 @@
   //---------------------------------------------------------------------------------------------------------------
   // Crash the server ... and therefor the Pod
   //---------------------------------------------------------------------------------------------------------------
-  function crashPod() {
+  function crashPod(callback) {
     var geturi = "crashPod";
     $.ajax({
       type: 'GET',
@@ -80,6 +100,11 @@
       .done(function (data, textStatus, jqXHR) {
         console.log("crashPod : Successfully called !");
         console.log(data);
+
+        // Update the environment data in the UI
+        $('#notifypodcrash').text("Hostname : " + data.hostname);
+        $("#notifypodcrasharea").css("display", "flex");
+
       })
       .fail(function (jqXHR, textStatus, errorThrown) {
         if (jqXHR.status == 500 || jqXHR.status == 0) {
@@ -91,6 +116,7 @@
       })
       .always(function () {
         console.log("crashPod : Ajax call done.");
+        callback();
       });
   } 
 </script>
@@ -118,7 +144,7 @@
     <div class="bx--grid bx--grid--full-width landing-page">
       <div class="bx--row landing-page__banner">
         <div class="bx--col-lg-16">
-          <img id="welcome_image" class="img-responsive" src="./images/k8s.png">
+          <img id="welcome_img" class="img-responsive" src="./images/blank.png">
         </div>
         <div class="bx--col-lg-16">
           <h1 id="welcome_msg" class="landing-page__heading"></h1>
@@ -171,6 +197,56 @@
         <br>
         <button id="refreshpodinfo" class="bx--btn bx--btn--primary" type="button">Refresh</button>
         <button id="crashpod" class="bx--btn bx--btn--danger" type="button">Crash the Pod !</button>
+
+        <!-- Notification of pod crash -->
+        <div id="notifypodcrasharea" data-notification class="bx--toast-notification bx--toast-notification--error"
+          role="alert">
+          <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
+            xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__icon" width="20" height="20"
+            viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M10,1c-5,0-9,4-9,9s4,9,9,9s9-4,9-9S15,1,10,1z M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"></path>
+            <path d="M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z" data-icon-path="inner-path" opacity="0"></path>
+          </svg>
+          <div class="bx--toast-notification__details">
+            <h3 class="bx--toast-notification__title">Pod has crashed</h3>
+            <p id="notifypodcrash" class="bx--toast-notification__subtitle"></p>
+          </div>
+          <button id="notifypodcrashareaclose" class="bx--toast-notification__close-button" type="button"
+            aria-label="close">
+            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
+              xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="20" height="20"
+              viewBox="0 0 32 32" aria-hidden="true">
+              <path
+                d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z">
+              </path>
+            </svg>
+          </button>
+        </div>
+        <!-- End of notification -->
+        <!-- Notification of app not responding -->
+        <div id="notifyappdead" data-notification class="bx--toast-notification bx--toast-notification--error"
+          role="alert">
+          <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
+            xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__icon" width="20" height="20"
+            viewBox="0 0 20 20" aria-hidden="true">
+            <path d="M10,1c-5,0-9,4-9,9s4,9,9,9s9-4,9-9S15,1,10,1z M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"></path>
+            <path d="M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z" data-icon-path="inner-path" opacity="0"></path>
+          </svg>
+          <div class="bx--toast-notification__details">
+            <h3 class="bx--toast-notification__title">Application is not responding</h3>
+            <p class="bx--toast-notification__subtitle">Possibly all pods have crashed ...</p>
+          </div>
+          <button id="notifyappdeadclose" class="bx--toast-notification__close-button" type="button" aria-label="close">
+            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
+              xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="20" height="20"
+              viewBox="0 0 32 32" aria-hidden="true">
+              <path
+                d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z">
+              </path>
+            </svg>
+          </button>
+        </div>
+        <!-- End of notification -->
       </div>
       <!-- TAB2 -->
       <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2" aria-hidden="true" hidden>

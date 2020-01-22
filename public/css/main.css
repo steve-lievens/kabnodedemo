@@ -50,7 +50,7 @@
   transition: 70ms cubic-bezier(.2,0,.38,.9);
 }
 
-#welcome_image{
+#welcome_img{
   max-height: 150px;
   padding-right: 50px;
 }

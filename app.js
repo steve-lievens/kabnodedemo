@@ -28,6 +28,7 @@ var APP_NAME = process.env.APP_NAME;
 var CLIENT_VERSION = process.env.CLIENT_VERSION;
 var CLIENT_TITLE = process.env.CLIENT_TITLE;
 var WELCOME_MSG = process.env.WELCOME_MSG;
+var WELCOME_IMG = process.env.WELCOME_IMG;
 var REGION = process.env.REGION;
 
 // --------------------------------------------------------------------------
@@ -37,6 +38,8 @@ console.log("INFO: Here we go ! Starting up", APP_NAME);
 
 console.log("INFO: CLIENT_VERSION", CLIENT_VERSION);
 console.log("INFO: CLIENT_TITLE", CLIENT_TITLE);
+console.log("INFO: WELCOME_MSG", WELCOME_MSG);
+console.log("INFO: WELCOME_IMG", WELCOME_IMG);
 
 // --------------------------------------------------------------------------
 // Setup the express server
@@ -80,7 +83,8 @@ app.get('/getEnvironment', function(req, res) {
       "region": REGION,
       "client_title": CLIENT_TITLE,
       "client_version": CLIENT_VERSION,
-      "welcome_msg": WELCOME_MSG
+      "welcome_msg": WELCOME_MSG,
+      "welcome_img": WELCOME_IMG
     }
     console.log("INFO: Service getEnvironment returning : " + JSON.stringify(hostobj));
     res.json(hostobj);
@@ -101,12 +105,13 @@ app.get('/senderror', function(req, res) {
 // REST API : crash the server ... yeah ... really !
 // --------------------------------------------------------------------------
 app.get('/crashPod', function(req, res) {
-  var notused = {
-    "zero": "zero"
+  var hostobj = {
+    "hostname": hostname
   }
-  console.log("INFO: Crashing Pod ...");
-  res.json(notused);
+  console.log("INFO: Crashing Pod " + hostname);
+  res.json(hostobj);
 
+  // This kills the server
   process.exit(1);
 });
 

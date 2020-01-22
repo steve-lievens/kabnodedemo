@@ -4,8 +4,9 @@ metadata:
   name: demo-config
 data:
   APP_NAME: IBM Cloud Demo App
-  CLIENT_TITLE: IBM Cloud Demo App
-  CLIENT_VERSION: 0.0.2
+  CLIENT_TITLE: IKS Demo App
+  CLIENT_VERSION: 0.1.0
+  WELCOME_IMG: k8s.png
 ---
 apiVersion: apps/v1
 kind: Deployment
