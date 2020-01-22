@@ -9,7 +9,7 @@
   <link rel="stylesheet" type="text/css" href="css/main.css">
   <script src="scripts/carbon-components.min.js"></script>
   <script src="scripts/jquery-3.4.1.min.js"></script>
-  <title>Node.js & Carbon UI Demo App</title>
+  <title></title>
 </head>
 
 <script>
@@ -25,7 +25,7 @@
     // Initial update
     getEnvironmentAndUpdate();
 
-    // Buttons
+    // Push Buttons
     $("#refreshpodinfo").click(function () {
       getEnvironmentAndUpdate();
     });
@@ -33,12 +33,16 @@
       crashPod(function () {
         getEnvironmentAndUpdate();
       });
-
     });
+
+    // Close Buttons
     $("#notifypodcrashareaclose").click(function () {
       $("#notifypodcrasharea").css("display", "none");
     });
-
+    $("#notifyappdeadclose").click(function () {
+      $("#notifyappdead").css("display", "none");
+    });
+    
   });
 
   //---------------------------------------------------------------------------------------------------------------
@@ -61,6 +65,7 @@
         $('#apptitle').text(data.client_title + " V" + data.client_version);
         $('#welcome_msg').text(data.welcome_msg);
         $('#hostname').text(data.hostname);
+        document.title = data.app_name;
 
         // Update the Welcome image
         var image_src = "./images/" + data.welcome_img;
