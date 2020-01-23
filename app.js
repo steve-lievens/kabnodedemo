@@ -96,7 +96,7 @@ app.get('/getEnvironment', function (req, res) {
 // --------------------------------------------------------------------------
 app.get('/senderror', function (req, res) {
   var notused = {
-    "zero": "zero"
+    "zero": "zerooo"
   }
   console.log("ERROR: Test error message - No real error has occurred.");
   res.json(notused);
