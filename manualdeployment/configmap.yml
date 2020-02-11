@@ -5,6 +5,6 @@ metadata:
 data:
   APP_NAME: IBM Cloud Demo App
   CLIENT_TITLE: Demo App
-  CLIENT_VERSION: 0.1.0
+  CLIENT_VERSION: 0.2.0
   WELCOME_IMG: ocp.png
   WELCOME_MSG: Manual Deployment Demo
