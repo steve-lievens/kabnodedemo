@@ -34,7 +34,7 @@ var REGION = process.env.REGION;
 // --------------------------------------------------------------------------
 // Initialization App Logging
 // --------------------------------------------------------------------------
-console.log("INFO: Here we go ! Starting up", APP_NAME);
+console.log("INFO: Here we go ! Starting up !!!", APP_NAME);
 
 console.log("INFO: CLIENT_VERSION", CLIENT_VERSION);
 console.log("INFO: CLIENT_TITLE", CLIENT_TITLE);
