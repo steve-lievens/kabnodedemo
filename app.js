@@ -61,7 +61,7 @@ if (process.env.MONGO_PW) {
 // --------------------------------------------------------------------------
 // Initialization App Logging
 // --------------------------------------------------------------------------
-console.log("INFO: Here we go ! Starting up", APP_NAME);
+console.log("INFO: Here we go ! Starting up !!!", APP_NAME);
 
 console.log("INFO: CLIENT_VERSION", CLIENT_VERSION);
 console.log("INFO: CLIENT_TITLE", CLIENT_TITLE);
@@ -213,4 +213,4 @@ app.get("/fibo", function (req, res) {
 function fibo(n) {
   if (n < 2) return 1;
   else return fibo(n - 2) + fibo(n - 1);
-}
+};
