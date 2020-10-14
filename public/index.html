@@ -104,6 +104,13 @@
   function connectToDb() {
     var geturi = "connectToDb";
 
+    console.log("Connecting to database ...");
+
+    // Update the connect to Db button
+    $('#dbconnect').text("Connecting to DB ...");
+    $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
+
+
     // GetEnvironment Ajax call (no caching)
     $.ajax({
       type: 'GET',
