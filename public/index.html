@@ -29,6 +29,9 @@
     $("#refreshpodinfo").click(function () {
       getEnvironmentAndUpdate();
     });
+    $("#dbconnect").click(function () {
+      connectToDb();
+    });
     $("#crashpod").click(function () {
       crashPod(function () {
         getEnvironmentAndUpdate();
@@ -92,6 +95,44 @@
       })
       .always(function () {
         console.log("getEnvironment : Ajax call done.");
+      });
+  }
+
+  //---------------------------------------------------------------------------------------------------------------
+  // connect to database
+  //---------------------------------------------------------------------------------------------------------------
+  function connectToDb() {
+    var geturi = "connectToDb";
+
+    // GetEnvironment Ajax call (no caching)
+    $.ajax({
+      type: 'GET',
+      url: geturi,
+      cache: false
+    })
+      .done(function (data, textStatus, jqXHR) {
+        console.log("connectToDb : Successfully connected to database");
+        console.log(data);
+
+        // Update the connect to Db button
+        $('#dbconnect').text("DB Connected !");
+        $("#dbconnect").attr("class", "bx--btn bx--btn--primary");
+
+      })
+      .fail(function (jqXHR, textStatus, errorThrown) {
+        if (jqXHR.status == 500 || jqXHR.status == 0) {
+          console.log("connectToDb : 500 Returned info from server :-(");
+          $('#dbconnect').text("DB Connection Failed !");
+          $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
+        }
+        else {
+          console.log("connectToDb : Some other fail ...");
+          $('#dbconnect').text("DB Connection Failed !");
+          $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
+        }
+      })
+      .always(function () {
+        console.log("connectToDb : Ajax call done.");
       });
   }
 
@@ -204,6 +245,7 @@
         <p id="hostname" style="padding: 0 1rem; font-size: 14px; font-weight: 600;"></p>
         <br>
         <button id="refreshpodinfo" class="bx--btn bx--btn--primary" type="button">Refresh</button>
+        <button id="dbconnect" class="bx--btn bx--btn--secondary" type="button">Connect to DB</button>
         <button id="crashpod" class="bx--btn bx--btn--danger" type="button">Crash the Pod !</button>
 
         <!-- Notification of pod crash -->
