@@ -210,8 +210,13 @@ app.get("/fibo", function (req, res) {
 // --------------------------------------------------------------------------
 // REST API : Post info
 // --------------------------------------------------------------------------
-app.post("/", function (req, res) {
-  console.log(req.body);
+app.post("/", jsonParser, function (req, res) {
+  var message = req.body;
+  console.log(message);
+
+  if(message.test){
+    console.log(message.test);
+  }
 
   res.status(200).end();
 });
