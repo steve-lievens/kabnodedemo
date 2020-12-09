@@ -1,325 +1,599 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="css/carbon-components.min.css"
+    />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <script src="scripts/carbon-components.min.js"></script>
+    <script src="scripts/jquery-3.4.1.min.js"></script>
+    <title></title>
+  </head>
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="favicon.ico">
-  <link rel="stylesheet" type="text/css" href="css/carbon-components.min.css">
-  <link rel="stylesheet" type="text/css" href="css/main.css">
-  <script src="scripts/carbon-components.min.js"></script>
-  <script src="scripts/jquery-3.4.1.min.js"></script>
-  <title></title>
-</head>
+  <script>
+    $(document).ready(function () {
+      console.log("Document is ready !");
 
-<script>
-  $(document).ready(function () {
-    console.log("Document is ready !");
+      // Initialize
 
-    // Initialize
+      // Hide the notifications
+      $("#notifypodcrasharea").css("display", "none");
+      $("#notifyappdead").css("display", "none");
 
-    // Hide the notifications
-    $("#notifypodcrasharea").css("display", "none");
-    $("#notifyappdead").css("display", "none");
-
-    // Initial update
-    getEnvironmentAndUpdate();
-
-    // Push Buttons
-    $("#refreshpodinfo").click(function () {
+      // Initial update
       getEnvironmentAndUpdate();
-    });
-    $("#dbconnect").click(function () {
-      connectToDb();
-    });
-    $("#crashpod").click(function () {
-      crashPod(function () {
+      getCodeEngineEvents();
+
+      // Push Buttons
+      $("#refreshpodinfo").click(function () {
         getEnvironmentAndUpdate();
       });
+      $("#dbconnect").click(function () {
+        connectToDb();
+      });
+      $("#crashpod").click(function () {
+        crashPod(function () {
+          getEnvironmentAndUpdate();
+        });
+      });
+
+      // Close Buttons
+      $("#notifypodcrashareaclose").click(function () {
+        $("#notifypodcrasharea").css("display", "none");
+      });
+      $("#notifyappdeadclose").click(function () {
+        $("#notifyappdead").css("display", "none");
+      });
     });
 
-    // Close Buttons
-    $("#notifypodcrashareaclose").click(function () {
-      $("#notifypodcrasharea").css("display", "none");
-    });
-    $("#notifyappdeadclose").click(function () {
-      $("#notifyappdead").css("display", "none");
-    });
+    //---------------------------------------------------------------------------------------------------------------
+    // Retrieve environment variables from server
+    //---------------------------------------------------------------------------------------------------------------
+    function getEnvironmentAndUpdate() {
+      var geturi = "getEnvironment";
 
-  });
-
-  //---------------------------------------------------------------------------------------------------------------
-  // Retrieve environment variables from server
-  //---------------------------------------------------------------------------------------------------------------
-  function getEnvironmentAndUpdate() {
-    var geturi = "getEnvironment";
-
-    // GetEnvironment Ajax call (no caching)
-    $.ajax({
-      type: 'GET',
-      url: geturi,
-      cache: false
-    })
-      .done(function (data, textStatus, jqXHR) {
-        console.log("getEnvironment : Successfully retrieved environment from server");
-        console.log(data);
-
-        // Update the environment data in the UI
-        $('#apptitle').text(data.client_title + " V" + data.client_version);
-        $('#welcome_msg').text(data.welcome_msg);
-        $('#hostname').text(data.hostname);
-        document.title = data.app_name;
-
-        // Update the Welcome image
-        var image_src = "./images/" + data.welcome_img;
-        $("#welcome_img").attr("src", image_src);
-
-        // Remove the error notification
-        $('#notifyappdead').css("display", "none");
+      // GetEnvironment Ajax call (no caching)
+      $.ajax({
+        type: "GET",
+        url: geturi,
+        cache: false,
       })
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status == 500 || jqXHR.status == 0) {
-          console.log("getEnvironment : 500 Returned info from server :-(");
-          // Show the error notification
-          $('#notifyappdead').css("display", "flex");
-          // Empty the hostname
-          $('#hostname').text("no pod available");
-        }
-        else {
-          console.log("getEnvironment : Some other fail ...");
-          // Show the error notification
-          $('#notifyappdead').css("display", "flex");
-          // Empty the hostname
-          $('#hostname').text("no pod available");
-        }
+        .done(function (data, textStatus, jqXHR) {
+          console.log(
+            "getEnvironment : Successfully retrieved environment from server"
+          );
+          console.log(data);
+
+          // Update the environment data in the UI
+          $("#apptitle").text(data.client_title + " V" + data.client_version);
+          $("#welcome_msg").text(data.welcome_msg);
+          $("#hostname").text(data.hostname);
+          document.title = data.app_name;
+
+          // Update the Welcome image
+          var image_src = "./images/" + data.welcome_img;
+          $("#welcome_img").attr("src", image_src);
+
+          // Remove the error notification
+          $("#notifyappdead").css("display", "none");
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          if (jqXHR.status == 500 || jqXHR.status == 0) {
+            console.log("getEnvironment : 500 Returned info from server :-(");
+            // Show the error notification
+            $("#notifyappdead").css("display", "flex");
+            // Empty the hostname
+            $("#hostname").text("no pod available");
+          } else {
+            console.log("getEnvironment : Some other fail ...");
+            // Show the error notification
+            $("#notifyappdead").css("display", "flex");
+            // Empty the hostname
+            $("#hostname").text("no pod available");
+          }
+        })
+        .always(function () {
+          console.log("getEnvironment : Ajax call done.");
+        });
+    }
+
+    //---------------------------------------------------------------------------------------------------------------
+    // Get Code Engine Events
+    //---------------------------------------------------------------------------------------------------------------
+    function getCodeEngineEvents() {
+      var geturi = "getevents";
+
+      // GetEnvironment Ajax call (no caching)
+      $.ajax({
+        type: "GET",
+        url: geturi,
+        cache: false,
       })
-      .always(function () {
-        console.log("getEnvironment : Ajax call done.");
-      });
-  }
+        .done(function (data, textStatus, jqXHR) {
+          console.log(
+            "getevents : Successfully retrieved environment from server"
+          );
+          console.log(data);
+          var test = "<tr><td>Load Balancer 1</td><td>HTTP</td><td>80</td><td>Round Robin</td><td>Maureen’s VM</td><td>Active</td></tr>";
 
-  //---------------------------------------------------------------------------------------------------------------
-  // connect to database
-  //---------------------------------------------------------------------------------------------------------------
-  function connectToDb() {
-    var geturi = "connectToDb";
+          $("#codeengineevents").html(test);
 
-    console.log("Connecting to database ...");
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          if (jqXHR.status == 500 || jqXHR.status == 0) {
+            console.log("getevents : 500 Returned info from server :-(");
+          } else {
+            console.log("getEnvironment : Some other fail ...");
+          }
+        })
+        .always(function () {
+          console.log("getevents : Ajax call done.");
+        });
+    }
 
-    // Update the connect to Db button
-    $('#dbconnect').text("Connecting to DB ...");
-    $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
+    //---------------------------------------------------------------------------------------------------------------
+    // connect to database
+    //---------------------------------------------------------------------------------------------------------------
+    function connectToDb() {
+      var geturi = "connectToDb";
 
+      console.log("Connecting to database ...");
 
-    // GetEnvironment Ajax call (no caching)
-    $.ajax({
-      type: 'GET',
-      url: geturi,
-      cache: false
-    })
-      .done(function (data, textStatus, jqXHR) {
-        console.log("connectToDb : Successfully connected to database");
-        console.log(data);
+      // Update the connect to Db button
+      $("#dbconnect").text("Connecting to DB ...");
+      $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
 
-        // Update the connect to Db button
-        $('#dbconnect').text("DB Connected !");
-        $("#dbconnect").attr("class", "bx--btn bx--btn--primary");
-
+      // GetEnvironment Ajax call (no caching)
+      $.ajax({
+        type: "GET",
+        url: geturi,
+        cache: false,
       })
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status == 500 || jqXHR.status == 0) {
-          console.log("connectToDb : 500 Returned info from server :-(");
-          $('#dbconnect').text("DB Connection Failed !");
-          $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
-        }
-        else {
-          console.log("connectToDb : Some other fail ...");
-          $('#dbconnect').text("DB Connection Failed !");
-          $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
-        }
+        .done(function (data, textStatus, jqXHR) {
+          console.log("connectToDb : Successfully connected to database");
+          console.log(data);
+
+          // Update the connect to Db button
+          $("#dbconnect").text("DB Connected !");
+          $("#dbconnect").attr("class", "bx--btn bx--btn--primary");
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          if (jqXHR.status == 500 || jqXHR.status == 0) {
+            console.log("connectToDb : 500 Returned info from server :-(");
+            $("#dbconnect").text("DB Connection Failed !");
+            $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
+          } else {
+            console.log("connectToDb : Some other fail ...");
+            $("#dbconnect").text("DB Connection Failed !");
+            $("#dbconnect").attr("class", "bx--btn bx--btn--danger");
+          }
+        })
+        .always(function () {
+          console.log("connectToDb : Ajax call done.");
+        });
+    }
+
+    //---------------------------------------------------------------------------------------------------------------
+    // Crash the server ... and therefor the Pod
+    //---------------------------------------------------------------------------------------------------------------
+    function crashPod(callback) {
+      var geturi = "crashPod";
+      $.ajax({
+        type: "GET",
+        url: geturi,
+        cache: false,
       })
-      .always(function () {
-        console.log("connectToDb : Ajax call done.");
-      });
-  }
+        .done(function (data, textStatus, jqXHR) {
+          console.log("crashPod : Successfully called !");
+          console.log(data);
 
-  //---------------------------------------------------------------------------------------------------------------
-  // Crash the server ... and therefor the Pod
-  //---------------------------------------------------------------------------------------------------------------
-  function crashPod(callback) {
-    var geturi = "crashPod";
-    $.ajax({
-      type: 'GET',
-      url: geturi,
-      cache: false
-    })
-      .done(function (data, textStatus, jqXHR) {
-        console.log("crashPod : Successfully called !");
-        console.log(data);
+          // Update the environment data in the UI
+          $("#notifypodcrash").text("Hostname : " + data.hostname);
+          $("#notifypodcrasharea").css("display", "flex");
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          if (jqXHR.status == 500 || jqXHR.status == 0) {
+            console.log("crashPod : 500 Returned info from server :-(");
+          } else {
+            console.log("crashPod : Some other fail ...");
+          }
+        })
+        .always(function () {
+          console.log("crashPod : Ajax call done.");
+          callback();
+        });
+    }
+  </script>
 
-        // Update the environment data in the UI
-        $('#notifypodcrash').text("Hostname : " + data.hostname);
-        $("#notifypodcrasharea").css("display", "flex");
-
-      })
-      .fail(function (jqXHR, textStatus, errorThrown) {
-        if (jqXHR.status == 500 || jqXHR.status == 0) {
-          console.log("crashPod : 500 Returned info from server :-(");
-        }
-        else {
-          console.log("crashPod : Some other fail ...");
-        }
-      })
-      .always(function () {
-        console.log("crashPod : Ajax call done.");
-        callback();
-      });
-  } 
-</script>
-
-<body>
-  <!-- HEADER -->
-  <header role="banner" data-header="" class="cv-header bx--header" aria-label="Demo App">
-    <a href="/" id="apptitle" class="cv-header-name bx--header__name router-link-exact-active router-link-active"></a>
-    <div class="bx--header__global">
-      <button type="button" aria-haspopup="true" class="cv-header-global-action bx--header__action"
-        aria-label="User avatar"><svg focusable="false" preserveAspectRatio="xMidYMid meet"
-          style="will-change: transform;" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 32 32"
-          aria-hidden="true">
-          <path
-            d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm-6 24.38v-2A3.22 3.22 0 0 1 13 21h6a3.22 3.22 0 0 1 3 3.39v2a11.92 11.92 0 0 1-12 0zm14-1.46v-.61A5.21 5.21 0 0 0 19 19h-6a5.2 5.2 0 0 0-5 5.31v.59a12 12 0 1 1 16 0z">
-          </path>
-          <path d="M16 7a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"></path>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- INFO PANE -->
-  <main class="bx--content">
-    <div class="bx--grid bx--grid--full-width landing-page">
-      <div class="bx--row landing-page__banner">
-        <div class="bx--col-lg-16">
-          <img id="welcome_img" class="img-responsive" src="./images/blank.png">
-        </div>
-        <div class="bx--col-lg-16">
-          <h1 id="welcome_msg" class="landing-page__heading"></h1>
-          <nav class="bx--breadcrumb bx--breadcrumb--no-trailing-slash" aria-label="Page navigation">
-            <div class="bx--breadcrumb-item"><a href="http://cloud.ibm.com" target="_blank" class="bx--link">More info
-                ...</a></div>
-          </nav>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB HEADERS -->
-    <div data-tabs class="bx--tabs">
-      <div class="bx--tabs-trigger" tabindex="0">
-        <a href="javascript:void(0)" class="bx--tabs-trigger-text" tabindex="-1"></a>
-        <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
-          xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true">
-          <path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path>
-        </svg>
-      </div>
-      <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
-        <li class="bx--tabs__nav-item bx--tabs__nav-item--selected " data-target=".tab-1" role="tab"
-          aria-selected="true">
-          <a tabindex="0" id="tab-link-1" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-            aria-controls="tab-panel-1">POD Info</a>
-        </li>
-        <li class="bx--tabs__nav-item bx--tabs__nav-item--disabled" data-target=".tab-2" role="tab">
-          <a tabindex="0" id="tab-link-2" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-            aria-controls="tab-panel-2">COS Demo</a>
-        </li>
-        <li class="bx--tabs__nav-item bx--tabs__nav-item--disabled" data-target=".tab-3" role="tab">
-          <a tabindex="0" id="tab-link-3" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-            aria-controls="tab-panel-3">App ID Demo</a>
-        </li>
-        <li class="bx--tabs__nav-item  bx--tabs__nav-item--disabled" data-target=".tab-4" role="tab"
-          aria-disabled="true">
-          <a tabindex="0" id="tab-link-4" class="bx--tabs__nav-link" href="javascript:void(0)" role="tab"
-            aria-controls="tab-panel-4">YAD (Yet Another Demo)</a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- TAB CONTENT -->
-    <div>
-      <!-- TAB1 -->
-      <div id="tab-panel-1" class="tab-1" role="tabpanel" aria-labelledby="tab-link-1" aria-hidden="false">
-        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Hostname of the POD :</p>
-        <br>
-        <p id="hostname" style="padding: 0 1rem; font-size: 14px; font-weight: 600;"></p>
-        <br>
-        <button id="refreshpodinfo" class="bx--btn bx--btn--primary" type="button">Refresh</button>
-        <button id="dbconnect" class="bx--btn bx--btn--secondary" type="button">Connect to DB</button>
-        <button id="crashpod" class="bx--btn bx--btn--danger" type="button">Crash the Pod !</button>
-
-        <!-- Notification of pod crash -->
-        <div id="notifypodcrasharea" data-notification class="bx--toast-notification bx--toast-notification--error"
-          role="alert">
-          <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
-            xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__icon" width="20" height="20"
-            viewBox="0 0 20 20" aria-hidden="true">
-            <path d="M10,1c-5,0-9,4-9,9s4,9,9,9s9-4,9-9S15,1,10,1z M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"></path>
-            <path d="M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z" data-icon-path="inner-path" opacity="0"></path>
+  <body>
+    <!-- HEADER -->
+    <header
+      role="banner"
+      data-header=""
+      class="cv-header bx--header"
+      aria-label="Demo App"
+    >
+      <a
+        href="/"
+        id="apptitle"
+        class="cv-header-name bx--header__name router-link-exact-active router-link-active"
+      ></a>
+      <div class="bx--header__global">
+        <button
+          type="button"
+          aria-haspopup="true"
+          class="cv-header-global-action bx--header__action"
+          aria-label="User avatar"
+        >
+          <svg
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+            style="will-change: transform"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 32 32"
+            aria-hidden="true"
+          >
+            <path
+              d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2zm-6 24.38v-2A3.22 3.22 0 0 1 13 21h6a3.22 3.22 0 0 1 3 3.39v2a11.92 11.92 0 0 1-12 0zm14-1.46v-.61A5.21 5.21 0 0 0 19 19h-6a5.2 5.2 0 0 0-5 5.31v.59a12 12 0 1 1 16 0z"
+            ></path>
+            <path
+              d="M16 7a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3z"
+            ></path>
           </svg>
-          <div class="bx--toast-notification__details">
-            <h3 class="bx--toast-notification__title">Pod has crashed</h3>
-            <p id="notifypodcrash" class="bx--toast-notification__subtitle"></p>
+        </button>
+      </div>
+    </header>
+
+    <!-- INFO PANE -->
+    <main class="bx--content">
+      <div class="bx--grid bx--grid--full-width landing-page">
+        <div class="bx--row landing-page__banner">
+          <div class="bx--col-lg-16">
+            <img
+              id="welcome_img"
+              class="img-responsive"
+              src="./images/blank.png"
+            />
           </div>
-          <button id="notifypodcrashareaclose" class="bx--toast-notification__close-button" type="button"
-            aria-label="close">
-            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
-              xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="20" height="20"
-              viewBox="0 0 32 32" aria-hidden="true">
-              <path
-                d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z">
-              </path>
-            </svg>
-          </button>
+          <div class="bx--col-lg-16">
+            <h1 id="welcome_msg" class="landing-page__heading"></h1>
+            <nav
+              class="bx--breadcrumb bx--breadcrumb--no-trailing-slash"
+              aria-label="Page navigation"
+            >
+              <div class="bx--breadcrumb-item">
+                <a href="http://cloud.ibm.com" target="_blank" class="bx--link"
+                  >More info ...</a
+                >
+              </div>
+            </nav>
+          </div>
         </div>
-        <!-- End of notification -->
-        <!-- Notification of app not responding -->
-        <div id="notifyappdead" data-notification class="bx--toast-notification bx--toast-notification--error"
-          role="alert">
-          <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
-            xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__icon" width="20" height="20"
-            viewBox="0 0 20 20" aria-hidden="true">
-            <path d="M10,1c-5,0-9,4-9,9s4,9,9,9s9-4,9-9S15,1,10,1z M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"></path>
-            <path d="M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z" data-icon-path="inner-path" opacity="0"></path>
+      </div>
+
+      <!-- TAB HEADERS -->
+      <div data-tabs class="bx--tabs">
+        <div class="bx--tabs-trigger" tabindex="0">
+          <a
+            href="javascript:void(0)"
+            class="bx--tabs-trigger-text"
+            tabindex="-1"
+          ></a>
+          <svg
+            focusable="false"
+            preserveAspectRatio="xMidYMid meet"
+            style="will-change: transform"
+            xmlns="http://www.w3.org/2000/svg"
+            width="10"
+            height="6"
+            viewBox="0 0 10 6"
+            aria-hidden="true"
+          >
+            <path d="M5 6L0 1 0.7 0.3 5 4.6 9.3 0.3 10 1z"></path>
           </svg>
-          <div class="bx--toast-notification__details">
-            <h3 class="bx--toast-notification__title">Application is not responding</h3>
-            <p class="bx--toast-notification__subtitle">Possibly all pods have crashed ...</p>
-          </div>
-          <button id="notifyappdeadclose" class="bx--toast-notification__close-button" type="button" aria-label="close">
-            <svg focusable="false" preserveAspectRatio="xMidYMid meet" style="will-change: transform;"
-              xmlns="http://www.w3.org/2000/svg" class="bx--toast-notification__close-icon" width="20" height="20"
-              viewBox="0 0 32 32" aria-hidden="true">
-              <path
-                d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z">
-              </path>
-            </svg>
-          </button>
         </div>
-        <!-- End of notification -->
+        <ul class="bx--tabs__nav bx--tabs__nav--hidden" role="tablist">
+          <li
+            class="bx--tabs__nav-item bx--tabs__nav-item--selected"
+            data-target=".tab-1"
+            role="tab"
+            aria-selected="true"
+          >
+            <a
+              tabindex="0"
+              id="tab-link-1"
+              class="bx--tabs__nav-link"
+              href="javascript:void(0)"
+              role="tab"
+              aria-controls="tab-panel-1"
+              >POD Info</a
+            >
+          </li>
+          <li class="bx--tabs__nav-item" data-target=".tab-2" role="tab">
+            <a
+              tabindex="0"
+              id="tab-link-2"
+              class="bx--tabs__nav-link"
+              href="javascript:void(0)"
+              role="tab"
+              aria-controls="tab-panel-2"
+              >Code Engine Events</a
+            >
+          </li>
+          <li
+            class="bx--tabs__nav-item bx--tabs__nav-item--disabled"
+            data-target=".tab-3"
+            role="tab"
+          >
+            <a
+              tabindex="0"
+              id="tab-link-3"
+              class="bx--tabs__nav-link"
+              href="javascript:void(0)"
+              role="tab"
+              aria-controls="tab-panel-3"
+              >App ID Demo</a
+            >
+          </li>
+          <li
+            class="bx--tabs__nav-item bx--tabs__nav-item--disabled"
+            data-target=".tab-4"
+            role="tab"
+            aria-disabled="true"
+          >
+            <a
+              tabindex="0"
+              id="tab-link-4"
+              class="bx--tabs__nav-link"
+              href="javascript:void(0)"
+              role="tab"
+              aria-controls="tab-panel-4"
+              >YAD (Yet Another Demo)</a
+            >
+          </li>
+        </ul>
       </div>
-      <!-- TAB2 -->
-      <div id="tab-panel-2" class="tab-2" role="tabpanel" aria-labelledby="tab-link-2" aria-hidden="true" hidden>
-        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for second tab goes here.</p>
-      </div>
-      <!-- TAB3 -->
-      <div id="tab-panel-3" class="tab-3" role="tabpanel" aria-labelledby="tab-link-3" aria-hidden="true" hidden>
-        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for third tab goes here.</p>
-      </div>
-      <!-- TAB4 -->
-      <div id="tab-panel-4" class="tab-4" role="tabpanel" aria-labelledby="tab-link-4" aria-hidden="true" hidden>
-        <p style="padding: 0 1rem; font-size: 14px; font-weight: 600;">Content for fourth tab goes here.</p>
-      </div>
-    </div>
-  </main>
 
-</body>
+      <!-- TAB CONTENT -->
+      <div>
+        <!-- TAB1 -->
+        <div
+          id="tab-panel-1"
+          class="tab-1"
+          role="tabpanel"
+          aria-labelledby="tab-link-1"
+          aria-hidden="false"
+        >
+          <p style="padding: 0 1rem; font-size: 14px; font-weight: 600">
+            Hostname of the POD :
+          </p>
+          <br />
+          <p
+            id="hostname"
+            style="padding: 0 1rem; font-size: 14px; font-weight: 600"
+          ></p>
+          <br />
+          <button
+            id="refreshpodinfo"
+            class="bx--btn bx--btn--primary"
+            type="button"
+          >
+            Refresh
+          </button>
+          <button
+            id="dbconnect"
+            class="bx--btn bx--btn--secondary"
+            type="button"
+          >
+            Connect to DB
+          </button>
+          <button id="crashpod" class="bx--btn bx--btn--danger" type="button">
+            Crash the Pod !
+          </button>
 
+          <!-- Notification of pod crash -->
+          <div
+            id="notifypodcrasharea"
+            data-notification
+            class="bx--toast-notification bx--toast-notification--error"
+            role="alert"
+          >
+            <svg
+              focusable="false"
+              preserveAspectRatio="xMidYMid meet"
+              style="will-change: transform"
+              xmlns="http://www.w3.org/2000/svg"
+              class="bx--toast-notification__icon"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              aria-hidden="true"
+            >
+              <path
+                d="M10,1c-5,0-9,4-9,9s4,9,9,9s9-4,9-9S15,1,10,1z M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"
+              ></path>
+              <path
+                d="M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"
+                data-icon-path="inner-path"
+                opacity="0"
+              ></path>
+            </svg>
+            <div class="bx--toast-notification__details">
+              <h3 class="bx--toast-notification__title">Pod has crashed</h3>
+              <p
+                id="notifypodcrash"
+                class="bx--toast-notification__subtitle"
+              ></p>
+            </div>
+            <button
+              id="notifypodcrashareaclose"
+              class="bx--toast-notification__close-button"
+              type="button"
+              aria-label="close"
+            >
+              <svg
+                focusable="false"
+                preserveAspectRatio="xMidYMid meet"
+                style="will-change: transform"
+                xmlns="http://www.w3.org/2000/svg"
+                class="bx--toast-notification__close-icon"
+                width="20"
+                height="20"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+              >
+                <path
+                  d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <!-- End of notification -->
+          <!-- Notification of app not responding -->
+          <div
+            id="notifyappdead"
+            data-notification
+            class="bx--toast-notification bx--toast-notification--error"
+            role="alert"
+          >
+            <svg
+              focusable="false"
+              preserveAspectRatio="xMidYMid meet"
+              style="will-change: transform"
+              xmlns="http://www.w3.org/2000/svg"
+              class="bx--toast-notification__icon"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              aria-hidden="true"
+            >
+              <path
+                d="M10,1c-5,0-9,4-9,9s4,9,9,9s9-4,9-9S15,1,10,1z M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"
+              ></path>
+              <path
+                d="M13.5,14.5l-8-8l1-1l8,8L13.5,14.5z"
+                data-icon-path="inner-path"
+                opacity="0"
+              ></path>
+            </svg>
+            <div class="bx--toast-notification__details">
+              <h3 class="bx--toast-notification__title">
+                Application is not responding
+              </h3>
+              <p class="bx--toast-notification__subtitle">
+                Possibly all pods have crashed ...
+              </p>
+            </div>
+            <button
+              id="notifyappdeadclose"
+              class="bx--toast-notification__close-button"
+              type="button"
+              aria-label="close"
+            >
+              <svg
+                focusable="false"
+                preserveAspectRatio="xMidYMid meet"
+                style="will-change: transform"
+                xmlns="http://www.w3.org/2000/svg"
+                class="bx--toast-notification__close-icon"
+                width="20"
+                height="20"
+                viewBox="0 0 32 32"
+                aria-hidden="true"
+              >
+                <path
+                  d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <!-- End of notification -->
+        </div>
+        <!-- TAB2 -->
+        <div
+          id="tab-panel-2"
+          class="tab-2"
+          role="tabpanel"
+          aria-labelledby="tab-link-2"
+          aria-hidden="true"
+          hidden
+        >
+
+          <!-- Table -->
+          <table class="bx--data-table bx--data-table--compact">
+            <thead>
+              <tr>
+                <th>
+                  <!-- checkbox th -->
+                  <!-- sortable th  -->
+                  <span class="bx--table-header-label">Bucket Name</span>
+                </th>
+                <th>
+                  <!-- checkbox th -->
+                  <!-- sortable th  -->
+                  <span class="bx--table-header-label">Filename</span>
+                </th>
+                <th>
+                  <!-- checkbox th -->
+                  <!-- sortable th  -->
+                  <span class="bx--table-header-label">Content Type</span>
+                </th>
+                <th>
+                  <!-- checkbox th -->
+                  <!-- sortable th  -->
+                  <span class="bx--table-header-label">Content Size</span>
+                </th>
+                <th>
+                  <!-- checkbox th -->
+                  <!-- sortable th  -->
+                  <span class="bx--table-header-label">Operation</span>
+                </th>
+                <th>
+                  <!-- checkbox th -->
+                  <!-- sortable th  -->
+                  <span class="bx--table-header-label">Time</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="codeengineevents">
+              
+            </tbody>
+          </table>
+        </div>
+        <!-- TAB3 -->
+        <div
+          id="tab-panel-3"
+          class="tab-3"
+          role="tabpanel"
+          aria-labelledby="tab-link-3"
+          aria-hidden="true"
+          hidden
+        >
+          <p style="padding: 0 1rem; font-size: 14px; font-weight: 600">
+            Content for third tab goes here.
+          </p>
+        </div>
+        <!-- TAB4 -->
+        <div
+          id="tab-panel-4"
+          class="tab-4"
+          role="tabpanel"
+          aria-labelledby="tab-link-4"
+          aria-hidden="true"
+          hidden
+        >
+          <p style="padding: 0 1rem; font-size: 14px; font-weight: 600">
+            Content for fourth tab goes here.
+          </p>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>
