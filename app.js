@@ -44,19 +44,18 @@ var MONGO_PW = process.env["database-password"];
 
 // Overrides
 // If host and port are given via ENV, override the defaults
-if(process.env.MONGO_HOST){
+if (process.env.MONGO_HOST) {
   MONGO_HOST = process.env.MONGO_HOST;
 }
-if(process.env.MONGO_PORT){
+if (process.env.MONGO_PORT) {
   MONGO_PORT = process.env.MONGO_PORT;
 }
-if (process.env.MONGO_USER){
+if (process.env.MONGO_USER) {
   MONGO_USER = process.env.MONGO_USER;
 }
 if (process.env.MONGO_PW) {
   MONGO_PW = process.env.MONGO_PW;
 }
- 
 
 // --------------------------------------------------------------------------
 // Initialization App Logging
@@ -71,8 +70,6 @@ console.log("INFO: MONGO_HOST", MONGO_HOST);
 console.log("INFO: MONGO_PORT", MONGO_PORT);
 console.log("INFO: MONGO_USER", MONGO_USER);
 console.log("INFO: MONGO_PW", "*********");
-
-
 
 // --------------------------------------------------------------------------
 // Setup the express server
@@ -89,7 +86,16 @@ var urlencodedParser = bodyParser.urlencoded({
 app.use(express.static(__dirname + "/public"));
 
 // Setup MongoDB URL
-var url = "mongodb://" + MONGO_USER + ":" + MONGO_PW + "@" + MONGO_HOST + ":" + MONGO_PORT + "/";
+var url =
+  "mongodb://" +
+  MONGO_USER +
+  ":" +
+  MONGO_PW +
+  "@" +
+  MONGO_HOST +
+  ":" +
+  MONGO_PORT +
+  "/";
 
 // --------------------------------------------------------------------------
 // Express Server runtime
@@ -155,11 +161,10 @@ app.get("/connectToDb", function (req, res) {
             db.close();
             console.log("INFO: connectToDb - Ended db connection.");
             var retObj = {
-              dbconnect: true
+              dbconnect: true,
             };
             console.log(
-              "INFO: Service connectToDb returning : " +
-                JSON.stringify(retObj)
+              "INFO: Service connectToDb returning : " + JSON.stringify(retObj)
             );
             res.json(retObj);
           }
@@ -214,8 +219,10 @@ app.post("/", jsonParser, function (req, res) {
   var message = req.body;
   console.log(message);
 
-  if(message.test){
-    console.log(message.test);
+  if (message.notification) {
+    if (message.notification.meta_headers) {
+      console.log(message.notification.meta_headers);
+    }
   }
 
   res.status(200).end();
@@ -227,4 +234,4 @@ app.post("/", jsonParser, function (req, res) {
 function fibo(n) {
   if (n < 2) return 1;
   else return fibo(n - 2) + fibo(n - 1);
-};
+}

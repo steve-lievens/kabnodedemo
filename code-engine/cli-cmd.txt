@@ -1,0 +1,3 @@
+ibmcloud ce subscription ping create --name meetup-ping --destination meetup-demo --schedule '*/2 * * * *'
+
+ibmcloud ce subscription cos create --name meetup-cos --destination meetup-demo --bucket meetup-code-engine
