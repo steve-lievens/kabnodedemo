@@ -61,7 +61,7 @@ if (process.env.MONGO_PW) {
 // --------------------------------------------------------------------------
 // Initialization App Logging
 // --------------------------------------------------------------------------
-console.log("INFO: Here we go ! Starting up !!!", APP_NAME);
+console.log("INFO: Here we go ! Starting up the app !!!", APP_NAME);
 
 console.log("INFO: CLIENT_VERSION", CLIENT_VERSION);
 console.log("INFO: CLIENT_TITLE", CLIENT_TITLE);
@@ -205,6 +205,15 @@ app.get("/fibo", function (req, res) {
   };
 
   res.json(fiboobj);
+});
+
+// --------------------------------------------------------------------------
+// REST API : Post info
+// --------------------------------------------------------------------------
+app.post("/", function (req, res) {
+  console.log(req.body);
+
+  res.status(200).end();
 });
 
 // --------------------------------------------------------------------------
