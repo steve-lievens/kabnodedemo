@@ -14,6 +14,11 @@ var os = require("os");
 var hostname = os.hostname();
 
 // --------------------------------------------------------------------------
+// In memory object to hold Code Engine Events
+// --------------------------------------------------------------------------
+var codeEngineEvents = [];
+
+// --------------------------------------------------------------------------
 // Read environment variables
 // --------------------------------------------------------------------------
 
@@ -213,16 +218,24 @@ app.get("/fibo", function (req, res) {
 });
 
 // --------------------------------------------------------------------------
+// REST API : get the list of Code Engine Events
+// --------------------------------------------------------------------------
+app.get("/getevents", function (req, res) {
+  res.json(codeEngineEvents);
+});
+
+// --------------------------------------------------------------------------
 // REST API : Post info
 // --------------------------------------------------------------------------
 app.post("/", jsonParser, function (req, res) {
   var message = req.body;
-  console.log(message);
+  console.log("Receiving event from Code Engine");
 
-  if (message.notification) {
-    if (message.notification.meta_headers) {
-      console.log(message.notification.meta_headers);
-    }
+  if (message.bucket){
+    console.log("It's an Event from Cloud Object Storage");
+    console.log("COS bucket : " + message.bucket);
+    codeEngineEvents.push(message);
+    console.log("Pushing it into the event list, we now have " + codeEngineEvents.length + " events");
   }
 
   res.status(200).end();
