@@ -107,6 +107,10 @@
     //---------------------------------------------------------------------------------------------------------------
     function getCodeEngineEvents() {
       var geturi = "getevents";
+      var rowPart1 = "<tr><td>";
+      var rowPart2 = "</td><td>";
+      var rowPart3 = "</td></tr>";
+      var tabledata = "";
 
       // GetEnvironment Ajax call (no caching)
       $.ajax({
@@ -119,9 +123,16 @@
             "getevents : Successfully retrieved environment from server"
           );
           console.log(data);
-          var test = "<tr><td>Load Balancer 1</td><td>HTTP</td><td>80</td><td>Round Robin</td><td>Maureen’s VM</td><td>Active</td></tr>";
 
-          $("#codeengineevents").html(test);
+          for(var i = 0; i < data.length; i++) {
+            var event = data[i];
+
+            var rowdata = rowPart1 + event.bucket + rowPart2 + event.notification.object_name + rowPart2 + event.notification.content_type + rowPart2 + event.notification.object_length + rowPart2 + event.operation + rowPart2 + event.notification.request_time + rowPart3;
+            tabledata += rowdata;
+            console.log(event.bucket);
+          }
+
+          $("#codeengineevents").html(tabledata);
 
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
