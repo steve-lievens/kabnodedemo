@@ -37,6 +37,7 @@ var CLIENT_TITLE = process.env.CLIENT_TITLE;
 var WELCOME_MSG = process.env.WELCOME_MSG;
 var WELCOME_IMG = process.env.WELCOME_IMG;
 var REGION = process.env.REGION;
+var FIBO_COUNT = process.env.FIBO_COUNT;
 
 // Mongo ENV
 // Some defaults first
@@ -208,7 +209,8 @@ app.get("/crashPod", function (req, res) {
 // REST API : get a fibonacci number
 // --------------------------------------------------------------------------
 app.get("/fibo", function (req, res) {
-  var fibo_number = fibo(30);
+  console.log("Generating Fibonacci number with value : " + FIBO_COUNT);
+  var fibo_number = fibo(FIBO_COUNT);
 
   var fiboobj = {
     fibo: fibo_number,
