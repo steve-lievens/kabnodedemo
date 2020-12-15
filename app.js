@@ -72,6 +72,7 @@ console.log("INFO: CLIENT_VERSION", CLIENT_VERSION);
 console.log("INFO: CLIENT_TITLE", CLIENT_TITLE);
 console.log("INFO: WELCOME_MSG", WELCOME_MSG);
 console.log("INFO: WELCOME_IMG", WELCOME_IMG);
+console.log("INFO: FIBO_COUNT", FIBO_COUNT);
 console.log("INFO: MONGO_HOST", MONGO_HOST);
 console.log("INFO: MONGO_PORT", MONGO_PORT);
 console.log("INFO: MONGO_USER", MONGO_USER);
