@@ -81,6 +81,11 @@
 
           // Remove the error notification
           $("#notifyappdead").css("display", "none");
+
+          // Remove the Mongo DB connect button when this demo is not enabled
+          if(!data.mongo_demo){
+            $("#dbconnect").remove();
+          }
         })
         .fail(function (jqXHR, textStatus, errorThrown) {
           if (jqXHR.status == 500 || jqXHR.status == 0) {
@@ -112,7 +117,7 @@
       var rowPart3 = "</td></tr>";
       var tabledata = "";
 
-      // GetEnvironment Ajax call (no caching)
+      // get Code Engine Events Ajax call (no caching)
       $.ajax({
         type: "GET",
         url: geturi,

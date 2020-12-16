@@ -38,6 +38,7 @@ var WELCOME_MSG = process.env.WELCOME_MSG;
 var WELCOME_IMG = process.env.WELCOME_IMG;
 var REGION = process.env.REGION;
 var FIBO_COUNT = process.env.FIBO_COUNT;
+var MONGO_DEMO = (process.env.MONGO_DEMO == 'true');
 
 // Mongo ENV
 // Some defaults first
@@ -73,10 +74,13 @@ console.log("INFO: CLIENT_TITLE", CLIENT_TITLE);
 console.log("INFO: WELCOME_MSG", WELCOME_MSG);
 console.log("INFO: WELCOME_IMG", WELCOME_IMG);
 console.log("INFO: FIBO_COUNT", FIBO_COUNT);
-console.log("INFO: MONGO_HOST", MONGO_HOST);
-console.log("INFO: MONGO_PORT", MONGO_PORT);
-console.log("INFO: MONGO_USER", MONGO_USER);
-console.log("INFO: MONGO_PW", "*********");
+console.log("INFO: MONGO_DEMO", MONGO_DEMO);
+if(MONGO_DEMO){
+  console.log("INFO: MONGO_HOST", MONGO_HOST);
+  console.log("INFO: MONGO_PORT", MONGO_PORT);
+  console.log("INFO: MONGO_USER", MONGO_USER);
+  console.log("INFO: MONGO_PW", "*********");  
+}
 
 // --------------------------------------------------------------------------
 // Setup the express server
@@ -135,6 +139,7 @@ app.get("/getEnvironment", function (req, res) {
     client_version: CLIENT_VERSION,
     welcome_msg: WELCOME_MSG,
     welcome_img: WELCOME_IMG,
+    mongo_demo: MONGO_DEMO
   };
   console.log(
     "INFO: Service getEnvironment returning : " + JSON.stringify(hostobj)
