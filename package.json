@@ -9,10 +9,10 @@
   },
   "dependencies": {
     "body-parser": "^1.19.0",
-    "carbon-components": "^10.7.4",
-    "dotenv-defaults": "^1.0.2",
+    "carbon-components": "^10.25.0",
+    "dotenv-defaults": "^2.0.1",
     "express": "^4.17.1",
-    "mongodb": "^3.6.2"
+    "mongodb": "^3.6.3"
   },
   "repository": {
     "type": "git",
