@@ -29,7 +29,7 @@
       getEnvironmentAndUpdate();
       getCodeEngineEvents();
 
-      // Push Buttons
+      // Push Buttons 
       $("#refreshpodinfo").click(function () {
         getEnvironmentAndUpdate();
       });
@@ -40,6 +40,9 @@
         crashPod(function () {
           getEnvironmentAndUpdate();
         });
+      });
+      $("#refresheventtable").click(function () {
+        getCodeEngineEvents();
       });
 
       // Close Buttons
@@ -541,6 +544,13 @@
           aria-hidden="true"
           hidden
         >
+        <button
+        id="refresheventtable"
+        class="bx--btn bx--btn--primary"
+        type="button"
+      >
+        Refresh
+      </button>
 
           <!-- Table -->
           <table class="bx--data-table bx--data-table--compact">
