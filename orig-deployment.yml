@@ -5,7 +5,7 @@ metadata:
 data:
   APP_NAME: IBM Cloud Demo App
   CLIENT_TITLE: IKS Demo App
-  CLIENT_VERSION: 1.1.0
+  CLIENT_VERSION: 0.1.0
   WELCOME_IMG: k8s.png
 ---
 apiVersion: apps/v1
@@ -57,21 +57,16 @@ spec:
   selector:
     app: kabnodejsdemo
 ---
-apiVersion: v1
-kind: Service
+apiVersion: extensions/v1beta1
+kind: Ingress
 metadata:
-  name: private-lb
-    labels:
-      app: kabnodejsdemo
-  annotations:
-    service.kubernetes.io/ibm-load-balancer-cloud-provider-enable-features: "proxy-protocol"
-    service.kubernetes.io/ibm-load-balancer-cloud-provider-ip-type: private
+  name: kabnodejsdemoing-http-80
 spec:
-  type: LoadBalancer
-  selector:
-    app: kabnodejsdemo
-  ports:
-  - name: http
-    protocol: TCP
-    port: 8080
-    targetPort: 8080
+  rules:
+  - host: kabnodejsdemo.ibmpubcloud.tk
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kabnodejsdemosvc-http-80
+          servicePort: 80
