@@ -1,0 +1,12 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+   name: export-sharedv4-pvc
+   annotations:
+     volume.beta.kubernetes.io/storage-class: export-sharedv4-sc
+spec:
+   accessModes:
+     - ReadWriteMany
+   resources:
+     requests:
+       storage: 1Gi

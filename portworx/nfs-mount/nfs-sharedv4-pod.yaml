@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: export-sharedv4-pod
+spec:
+  containers:
+  - name: nfsmountexporter
+    image: busybox:1.28
+    volumeMounts:
+    - name: sharedv4-volume
+      mountPath: /sharedv4-portworx-volume
+    command: ["/bin/sh", "-ec", "sleep 3600"]
+  volumes:
+  - name: sharedv4-volume
+    persistentVolumeClaim:
+      claimName: export-sharedv4-pvc
