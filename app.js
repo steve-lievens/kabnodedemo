@@ -144,6 +144,7 @@ app.get("/getEnvironment", function (req, res) {
   console.log(
     "INFO: Service getEnvironment returning : " + JSON.stringify(hostobj)
   );
+  console.log(JSON.stringify(req.headers));
   res.json(hostobj);
 });
 
