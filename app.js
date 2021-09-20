@@ -2,6 +2,8 @@
 // --------------------------------------------------------------------------
 // Require statements
 // --------------------------------------------------------------------------
+var http = require( 'http' )
+var proxiedHttp = require( 'findhit-proxywrap' ).proxy( http, {strict: false} )
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongoClient = require("mongodb").MongoClient;
@@ -112,9 +114,11 @@ var url =
 // Express Server runtime
 // --------------------------------------------------------------------------
 // Start our server !
-app.listen(process.env.PORT || 8080, function () {
-  console.log("INFO: app is listening on port %s", process.env.PORT || 8080);
-});
+//app.listen(process.env.PORT || 8080, function () {
+//  console.log("INFO: app is listening on port %s", process.env.PORT || 8080);
+//});
+
+var srv = proxiedHttp.createServer( app ).listen( process.env.PORT || 8080 )
 
 // --------------------------------------------------------------------------
 // REST API : health
@@ -144,7 +148,31 @@ app.get("/getEnvironment", function (req, res) {
   console.log(
     "INFO: Service getEnvironment returning : " + JSON.stringify(hostobj)
   );
-  console.log(JSON.stringify(req.headers));
+
+  // get all request info from the client
+  const echo = {
+    path: req.path,
+    headers: req.headers,
+    method: req.method,
+    body: req.body,
+    cookies: req.cookies,
+    fresh: req.fresh,
+    hostname: req.hostname,
+    ip: req.ip,
+    ips: req.ips,
+    protocol: req.protocol,
+    query: req.query,
+    subdomains: req.subdomains,
+    xhr: req.xhr,
+    os: {
+      hostname: os.hostname()
+    },
+    connection: {
+      servername: req.servername
+    }
+  };
+
+  console.log(JSON.stringify(echo));
   res.json(hostobj);
 });
 
