@@ -143,7 +143,8 @@ app.get("/getEnvironment", function (req, res) {
     client_version: CLIENT_VERSION,
     welcome_msg: WELCOME_MSG,
     welcome_img: WELCOME_IMG,
-    mongo_demo: MONGO_DEMO
+    mongo_demo: MONGO_DEMO,
+    client_ip: req.ip
   };
   console.log(
     "INFO: Service getEnvironment returning : " + JSON.stringify(hostobj)
@@ -172,7 +173,6 @@ app.get("/getEnvironment", function (req, res) {
     }
   };
 
-  console.log(JSON.stringify(echo));
   res.json(hostobj);
 });
 

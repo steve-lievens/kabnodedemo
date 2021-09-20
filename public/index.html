@@ -76,6 +76,7 @@
           $("#apptitle").text(data.client_title + " V" + data.client_version);
           $("#welcome_msg").text(data.welcome_msg);
           $("#hostname").text(data.hostname);
+          $("#client_ip").text(data.client_ip);
           document.title = data.app_name;
 
           // Update the Welcome image
@@ -393,9 +394,15 @@
           <p style="padding: 0 1rem; font-size: 14px; font-weight: 600">
             Hostname of the POD :
           </p>
-          <br />
           <p
             id="hostname"
+            style="padding: 0 1rem; font-size: 14px; font-weight: 600"
+          ></p>
+          <p style="padding: 0 1rem; font-size: 14px; font-weight: 600">
+            Client IP address (only when Proxy Protocol is available) :
+          </p>
+          <p
+            id="client_ip"
             style="padding: 0 1rem; font-size: 14px; font-weight: 600"
           ></p>
           <br />
