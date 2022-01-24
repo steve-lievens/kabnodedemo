@@ -233,7 +233,7 @@ app.get("/crashPod", function (req, res) {
   var hostobj = {
     hostname: hostname,
   };
-  console.log("INFO: Crashing Pod " + hostname);
+  console.log("ERROR: Crashing Pod " + hostname);
   res.json(hostobj);
 
   // This kills the server
